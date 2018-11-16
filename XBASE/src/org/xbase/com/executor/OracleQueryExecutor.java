@@ -5,6 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+
+import org.xbase.com.constants.DebugConstants;
+import org.xbase.com.constants.PatternConstants;
+
 import static java.lang.System.out;
 
 public class OracleQueryExecutor {
@@ -14,6 +18,7 @@ public class OracleQueryExecutor {
 		ResultSet resultSet = null;
 		try {
 			pstmt = conn.prepareStatement(query);
+			System.out.println(DebugConstants.DEBUG + PatternConstants.SPACESEPERATOR + query);
 			resultSet = pstmt.executeQuery();
 		} catch (SQLException sqle) {
 			out.println(sqle.getMessage());

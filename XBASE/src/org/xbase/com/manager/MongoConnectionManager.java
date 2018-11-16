@@ -2,8 +2,6 @@ package org.xbase.com.manager;
 
 import static java.lang.System.out;
 
-import java.net.UnknownHostException;
-
 import org.xbase.com.constants.MigratorConstants;
 
 import com.mongodb.MongoClient;
@@ -21,8 +19,8 @@ public class MongoConnectionManager {
 	public MongoClient getMongoClientHandle() {
 		MongoClient mongo = null;
 		try {
-			mongo = new MongoClient(MigratorConstants.LOCALHOST, MigratorConstants.MONGODEFAULTPORT);
-		} catch (UnknownHostException e) {
+			mongo = new MongoClient(MigratorConstants.LOCALHOST, Integer.parseInt(MigratorConstants.MONGODEFAULTPORT));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

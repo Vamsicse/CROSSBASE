@@ -9,6 +9,8 @@ import java.util.Properties;
 
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.PatternConstants;
+import org.xbase.com.environment.EnvironmentSettings;
 
 /**
  * @author VAMSI KRISHNA MYALAPALLI (vamsikrishna.vasu@gmail.com)
@@ -31,31 +33,43 @@ public class ConfigManager {
         String configFilePath = configArgs[0];
         InputStream inputStream = new FileInputStream(configFilePath);
         properties.load(inputStream);
-        
+        try {
+        	EnvironmentSettings.DEBUG = Boolean.valueOf(properties.getProperty(ConfigConstants.DEBUGMODE, "false"));
+        	if(EnvironmentSettings.DEBUG) {
+        		System.out.println("   [DEBUG] Debug Mode Enabled");
+        	}
+        }
+        catch(Exception e) {
+        	EnvironmentSettings.DEBUG = false;
+        }
     	String dataInjectionMode = properties.getProperty(ConfigConstants.DATAINJECTIONMODE, "false");
     	String dataInjectionRange = properties.getProperty(ConfigConstants.DATAINJECTIONRANGE, "0");
+    	String inventoryFileName = properties.getProperty(ConfigConstants.INVENTORYFILENAME);
     	String inventoryFilePath = properties.getProperty(ConfigConstants.INVENTORYFILEPATH); 
     	String hostName = properties.getProperty(ConfigConstants.HOSTNAME, ConfigConstants.LOCALHOST);
     	String migrateIndexes = properties.getProperty(ConfigConstants.MIGRATEINDEXES); 
     	String migrationMode = properties.getProperty(ConfigConstants.MIGRATIONMODE);
+    	String migrateSystemSchema = properties.getProperty(ConfigConstants.MIGRATESYSTEMSCHEMA);
     	String password = properties.getProperty(ConfigConstants.PASSWORD);
-    	String schemaToMigrate = properties.getProperty(ConfigConstants.SCHEMATOMIGRATE);
+    	String schemaToMigrate = properties.getProperty(ConfigConstants.SCHEMATOMIGRATE).toUpperCase();
     	String sourceDatabasePassword = properties.getProperty(ConfigConstants.SOURCEDATABASEPASSWORD); 
     	String sourceDatabase = properties.getProperty(ConfigConstants.SOURCEDATABASE);
     	String sourceDatabasePort = properties.getProperty(ConfigConstants.SOURCEDATABASEPORT);  
     	String sourceDatabaseUsername = properties.getProperty(ConfigConstants.SOURCEDATABASEUSERNAME);
     	String targetDatabase = properties.getProperty(ConfigConstants.TARGETDATABASE); 
     	String targetDatabasePassword = properties.getProperty(ConfigConstants.TARGETDATABASEPASSWORD); 
-    	String targetDatabasePort = properties.getProperty(ConfigConstants.TARGETDATABASEPORT, String.valueOf(MigratorConstants.MONGODEFAULTPORT)); 
+    	String targetDatabasePort = properties.getProperty(ConfigConstants.TARGETDATABASEPORT, MigratorConstants.MONGODEFAULTPORT); 
     	String targetDatabaseUserName = properties.getProperty(ConfigConstants.TARGETDATABASEUSERNAME);
     	String user = properties.getProperty(ConfigConstants.USER);
         
     	configMap.put(ConfigConstants.DATAINJECTIONMODE, dataInjectionMode);
     	configMap.put(ConfigConstants.DATAINJECTIONRANGE, dataInjectionRange);
     	configMap.put(ConfigConstants.HOSTNAME, hostName);
+    	configMap.put(ConfigConstants.INVENTORYFILENAME, inventoryFileName);
     	configMap.put(ConfigConstants.INVENTORYFILEPATH, inventoryFilePath); 
     	configMap.put(ConfigConstants.MIGRATEINDEXES, migrateIndexes); 
     	configMap.put(ConfigConstants.MIGRATIONMODE, migrationMode);
+    	configMap.put(ConfigConstants.MIGRATESYSTEMSCHEMA, migrateSystemSchema);
     	configMap.put(ConfigConstants.PASSWORD, password);
     	configMap.put(ConfigConstants.SCHEMATOMIGRATE, schemaToMigrate);
     	configMap.put(ConfigConstants.SOURCEDATABASEPASSWORD, sourceDatabasePassword); 
@@ -95,6 +109,15 @@ public class ConfigManager {
         System.out.println("*** DataInjectionMode - - - - - - - [ " + configMap.get(ConfigConstants.DATAINJECTIONMODE) + " ]");
         System.out.println("*** DataInjectionRange - - - - - - -[ " + configMap.get(ConfigConstants.DATAINJECTIONRANGE) + " ]");
         System.out.println();
+        
+        if(configMap.get(ConfigConstants.SCHEMATOMIGRATE).equals(PatternConstants.ASTERIK)) {
+        	if(!configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME).startsWith("SYS")) {
+        		System.out.print("ERROR: ");
+        		System.out.println("To migrate all the schemas, USER running this tool has to be " + MigratorConstants.SYS + " or " + MigratorConstants.SYSTEM);
+        		System.out.println("Exiting...");
+        		System.exit(1);
+        	}
+        }
 	}	
 	
 	public static Map<String, String> getConfigMap() {
