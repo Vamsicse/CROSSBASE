@@ -23,6 +23,7 @@ public interface ConfigConstants {
 	public static final String PASSWORD = "password";
 	public static final String SCHEMATOMIGRATE = "SchemaToMigrate";
 	public static final String SOURCEDATABASE = "SourceDatabase";
+	public static final String SOURCEDATABASENAME = "SourceDatabaseName";
 	public static final String SOURCEDATABASEPASSWORD = "SourceDatabasePassword"; 
 	public static final String SOURCEDATABASEPORT = "SourceDatabasePort";  
 	public static final String SOURCEDATABASEUSERNAME = "SourceDatabaseUsername";

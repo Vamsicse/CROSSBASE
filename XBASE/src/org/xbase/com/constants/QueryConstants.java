@@ -1,19 +1,16 @@
+/**
+ * 
+ */
 package org.xbase.com.constants;
 
+/**
+ * @author VAMSI KRISHNA MYALAPALLI (vamsikrishna.vasu@gmail.com)
+ *
+ */
 public interface QueryConstants {
-
-	public static final String ALL_CONSTRAINTS = "ALL_CONSTRAINTS";
-	public static final String ALL_INDEXES = "ALL_INDEXES";
-	public static final String ALL_TABLES = "ALL_TABLES";
-	public static final String ALL_USERS = "ALL_USERS";
-	public static final String DBA_CONSTRAINTS = "DBA_CONSTRAINTS";
-	public static final String DBA_INDEXES = "DBA_INDEXES";
-	public static final String DBA_OBJECTS = "DBA_OBJECTS";
-	public static final String DBA_USERS = "DBA_USERS";
-	public static final String SCHEMA = "SCHEMA";
+	
+	public static final String INDEXCREATED = "Index Created";
 	public static final String SIMPLEFTS = "SELECT * FROM ";
-	public static final String TABLE = "TABLE";
-	public static final String USER_TABLES = "USER_TABLES";
-	public static final String V$DATABASE = "V$DATABASE";
+	public static final String TABLECREATED = "Table Created";
 	
 }

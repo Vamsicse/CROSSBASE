@@ -3,14 +3,23 @@ package org.xbase.com.manager;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.xbase.com.actions.MessageType;
 import org.xbase.com.constants.ConfigConstants;
+import org.xbase.com.constants.DebugConstants;
+import org.xbase.com.constants.MessageConstants;
 import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.OraQueryConstants;
 import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.environment.EnvironmentSettings;
+import org.xbase.com.executor.OracleQueryExecutor;
+
+import oracle.jdbc.dcn.QueryChangeDescription;
 
 /**
  * @author VAMSI KRISHNA MYALAPALLI (vamsikrishna.vasu@gmail.com)
@@ -35,9 +44,6 @@ public class ConfigManager {
         properties.load(inputStream);
         try {
         	EnvironmentSettings.DEBUG = Boolean.valueOf(properties.getProperty(ConfigConstants.DEBUGMODE, "false"));
-        	if(EnvironmentSettings.DEBUG) {
-        		System.out.println("   [DEBUG] Debug Mode Enabled");
-        	}
         }
         catch(Exception e) {
         	EnvironmentSettings.DEBUG = false;
@@ -82,9 +88,33 @@ public class ConfigManager {
     	configMap.put(ConfigConstants.TARGETDATABASEUSERNAME, targetDatabaseUserName);
     	configMap.put(ConfigConstants.USER, user);
     	
+    	String sourceDatabaseName = fetchDatabaseName();
+    	configMap.put(ConfigConstants.SOURCEDATABASENAME, sourceDatabaseName);
+    	
         printConfigDetails(configMap);
          
 		return configMap;
+	}
+
+	/**
+	 * This method fetches source database name (instance name) Eg:orcl
+	 * @return DatabaseName
+	 */
+	private static String fetchDatabaseName() {
+		ResultSet rs = OracleQueryExecutor.execute("SELECT " + OraQueryConstants.ORA_DATABASE_NAME + " FROM " + OraQueryConstants.DUAL);
+		String databaseName = null;
+		try {
+			while(rs.next()) {
+				databaseName = rs.getString(1).toUpperCase();
+			}
+		} catch (SQLException e) {
+			InventoryManager.log(MessageConstants.EXCEPTIONWHILE + " fetching Database Name: " + e.getMessage(), MessageType.ERROR);
+			e.printStackTrace();
+		}
+		if(EnvironmentSettings.DEBUG) {
+			System.out.println(ConfigConstants.SOURCEDATABASENAME + PatternConstants.DATASEPERATOR + databaseName);
+		}
+		return databaseName;
 	}
 
 	/**
@@ -109,6 +139,9 @@ public class ConfigManager {
         System.out.println("*** DataInjectionMode - - - - - - - [ " + configMap.get(ConfigConstants.DATAINJECTIONMODE) + " ]");
         System.out.println("*** DataInjectionRange - - - - - - -[ " + configMap.get(ConfigConstants.DATAINJECTIONRANGE) + " ]");
         System.out.println();
+        if(EnvironmentSettings.DEBUG) {
+    		System.out.println(DebugConstants.DEBUG + "Debug Mode Enabled" + PatternConstants.DOUBLELINESEPERATOR);
+    	}
         
         if(configMap.get(ConfigConstants.SCHEMATOMIGRATE).equals(PatternConstants.ASTERIK)) {
         	if(!configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME).startsWith("SYS")) {

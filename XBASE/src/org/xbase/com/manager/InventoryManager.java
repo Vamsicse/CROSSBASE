@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xbase.com.actions.MessageType;
 import org.xbase.com.actions.MigratorActions;
 import org.xbase.com.constants.ActionConstants;
 import org.xbase.com.constants.MigratorConstants;
@@ -17,8 +18,6 @@ import org.xbase.com.util.IOUtil;
  * @author VAMSI KRISHNA MYALAPALLI (vamsikrishna.vasu@gmail.com)
  *
  */
-
-// TODO: List schema, collection name in inventory
 
 public class InventoryManager {
 
@@ -40,8 +39,12 @@ public class InventoryManager {
 		inventoryLog.append(PatternConstants.LINEPATTERNHIPHEN + PatternConstants.LINESEPERATOR);
 	}
 	
+	public static void log(String currentMessage, MessageType messageType) {
+		inventoryLog.append(messageType + PatternConstants.DATASEPERATOR + currentMessage + PatternConstants.LINESEPERATOR);
+	}
+	
 	public static void log(String currentMessage) {
-		inventoryLog.append(currentMessage);
+		log(currentMessage, MessageType.INFO);
 	}
 	
 	public static String getTimeStamp() {

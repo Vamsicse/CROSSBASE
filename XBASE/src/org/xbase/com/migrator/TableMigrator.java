@@ -15,6 +15,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.DebugConstants;
+import org.xbase.com.constants.MessageConstants;
+import org.xbase.com.constants.OraQueryConstants;
 import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.constants.QueryConstants;
 import org.xbase.com.converter.TableToJSONConverter;
@@ -38,21 +40,21 @@ public class TableMigrator {
 		List<String> schemaList = new ArrayList<String>();
 		if (schemaToMigrate.equals("*")) {
 			System.out.println("All");
-			schemaList = populateListFromQuery(conn, QueryConstants.SCHEMA, schemaToMigrate);
+			schemaList = populateListFromQuery(conn, OraQueryConstants.SCHEMA, schemaToMigrate);
 		} else {
 			schemaList.add(schemaToMigrate);
 			System.out.println(schemaToMigrate);
 		}
 		for (String currentSchema : schemaList) {
 			List<String> tableList = new ArrayList<String>();
-			tableList = populateListFromQuery(conn, QueryConstants.TABLE, schemaToMigrate);
+			tableList = populateListFromQuery(conn, OraQueryConstants.TABLE, schemaToMigrate);
 			for (String currentTable : tableList) {
 				String query = QueryConstants.SIMPLEFTS + currentSchema + PatternConstants.DOTSEPERATOR + currentTable;
 				ResultSet resultSet = OracleQueryExecutor.execute(conn, query);
 				JSONArray jsonArray = TableToJSONConverter.getJSON(resultSet);
 				out.println();
 				out.println(jsonArray.toString(4));
-				String databaseName = "sampledb";
+				String databaseName = configMap.get(ConfigConstants.SOURCEDATABASENAME);
 				String collectionName = currentTable;
 				MongoQueryExecutor mongoQE = MongoQueryExecutor.getInstance();
 				// mongoQE.printCollection(databaseName, "vamsi");
@@ -70,11 +72,11 @@ public class TableMigrator {
 	private static List<String> populateListFromQuery(Connection conn, String objectType, String schemaToMigrate) {
 		List<String> schemaList = new ArrayList<String>();
 		String query = null;
-		if(QueryConstants.SCHEMA.equals(objectType)) {
-			query = "SELECT USERNAME FROM " + QueryConstants.DBA_USERS;
+		if(OraQueryConstants.SCHEMA.equals(objectType)) {
+			query = "SELECT USERNAME FROM " + OraQueryConstants.DBA_USERS;
 		}
-		else if (QueryConstants.TABLE.equals(objectType)){
-			query = "SELECT TABLE_NAME FROM " + QueryConstants.ALL_TABLES + " WHERE OWNER='" + schemaToMigrate + "'";
+		else if (OraQueryConstants.TABLE.equals(objectType)){
+			query = "SELECT TABLE_NAME FROM " + OraQueryConstants.ALL_TABLES + " WHERE OWNER='" + schemaToMigrate + "'";
 		}
 		else {
 			throw new RuntimeException("Unknown Object Type. Cannot populate Schema/Table List");
@@ -84,7 +86,7 @@ public class TableMigrator {
 			while(resultSet.next())
 				schemaList.add(resultSet.getString(1).toUpperCase());
 		} catch (SQLException e) {
-			System.out.println(DebugConstants.DEBUG + "Exception while finding schema list");
+			System.out.println(DebugConstants.DEBUG + MessageConstants.EXCEPTIONWHILE + " finding schema list: " + e.getMessage());
 			e.printStackTrace();
 		}
 		System.out.println(DebugConstants.DEBUG + ConfigConstants.SCHEMATOMIGRATE + PatternConstants.DATASEPERATOR + schemaList);

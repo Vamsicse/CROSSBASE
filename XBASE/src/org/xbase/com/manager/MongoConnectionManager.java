@@ -26,7 +26,7 @@ public class MongoConnectionManager {
 
 		// MongoCredential credential = MongoCredential.createCredential("sampleUser","myDb", "password".toCharArray());
 		
-		out.println("Connected to the database successfully...\n");
+		out.println("Connected to the Mongo database...\n");
 		return mongo;
 	}
 }
