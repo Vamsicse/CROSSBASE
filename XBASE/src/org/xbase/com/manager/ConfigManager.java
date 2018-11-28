@@ -5,21 +5,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import org.xbase.com.actions.MessageType;
 import org.xbase.com.constants.ConfigConstants;
-import org.xbase.com.constants.DebugConstants;
 import org.xbase.com.constants.MessageConstants;
 import org.xbase.com.constants.MigratorConstants;
-import org.xbase.com.constants.OraQueryConstants;
+import org.xbase.com.constants.OraTables;
 import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.environment.EnvironmentSettings;
 import org.xbase.com.executor.OracleQueryExecutor;
-
-import oracle.jdbc.dcn.QueryChangeDescription;
+import org.xbase.com.util.PrintUtil;
 
 /**
  * @author VAMSI KRISHNA MYALAPALLI (vamsikrishna.vasu@gmail.com)
@@ -28,71 +26,87 @@ import oracle.jdbc.dcn.QueryChangeDescription;
 public class ConfigManager {
     
 	private ConfigManager() {}
+    private static boolean configMapInitialized = false, propertiesInitialized=false;
+    private static Map<String,String> configMap = new TreeMap<String,String>();
+    private static final Properties properties = new Properties();
     
-    private static Map<String,String> configMap = new HashMap<String,String>();
-
 	public static Map<String, String> populateConfigDetails(String[] configArgs) throws IOException {
-		
-        final Properties properties = new Properties();
+    
         if (configArgs.length < 1) {
-            System.out.println("\n***** Please pass the location of XBASE.properties file. Exiting ******\n");
+            PrintUtil.log(PatternConstants.LINESEPERATOR + MigratorConstants.PROPERTYFILEMISSING + PatternConstants.LINESEPERATOR);
             System.exit(1);
         }
         
         String configFilePath = configArgs[0];
         InputStream inputStream = new FileInputStream(configFilePath);
         properties.load(inputStream);
+        propertiesInitialized=true;
         try {
-        	EnvironmentSettings.DEBUG = Boolean.valueOf(properties.getProperty(ConfigConstants.DEBUGMODE, "false"));
+        	EnvironmentSettings.DEBUGMODE = Boolean.valueOf(properties.getProperty(ConfigConstants.DEBUGMODE, "false"));
+        	EnvironmentSettings.DEBUGMODEV = Boolean.valueOf(properties.getProperty(ConfigConstants.DEBUGMODEV, "false"));
         }
         catch(Exception e) {
-        	EnvironmentSettings.DEBUG = false;
+        	EnvironmentSettings.DEBUGMODE = EnvironmentSettings.DEBUGMODEV = false;
         }
-    	String dataInjectionMode = properties.getProperty(ConfigConstants.DATAINJECTIONMODE, "false");
-    	String dataInjectionRange = properties.getProperty(ConfigConstants.DATAINJECTIONRANGE, "0");
+        
+        String migrationMode = properties.getProperty(ConfigConstants.MIGRATIONMODE);
+        String hostName = properties.getProperty(ConfigConstants.HOSTNAME, ConfigConstants.LOCALHOST);
+        String sourceDatabase = properties.getProperty(ConfigConstants.SOURCEDATABASE);
+        String sourceDatabasePort = properties.getProperty(ConfigConstants.SOURCEDATABASEPORT);
+        String sourceDatabaseUsername = properties.getProperty(ConfigConstants.SOURCEDATABASEUSERNAME);
+        String sourceDatabasePassword = properties.getProperty(ConfigConstants.SOURCEDATABASEPASSWORD);
+        String schemaToMigrate = properties.getProperty(ConfigConstants.SCHEMATOMIGRATE).toUpperCase();
+        String migrateSystemSchema = properties.getProperty(ConfigConstants.MIGRATESYSTEMSCHEMA, MessageConstants.FALSE);
+        String targetDatabase = properties.getProperty(ConfigConstants.TARGETDATABASE); 
+        String targetDatabasePort = properties.getProperty(ConfigConstants.TARGETDATABASEPORT, MigratorConstants.MONGODEFAULTPORT);
+        String targetDatabaseName = properties.getProperty(ConfigConstants.TARGETDATABASENAME);
+    	String targetDatabaseUserName = properties.getProperty(ConfigConstants.TARGETDATABASEUSERNAME);
+    	String targetDatabasePassword = properties.getProperty(ConfigConstants.TARGETDATABASEPASSWORD); 
+    	String embedding = properties.getProperty(ConfigConstants.EMBEDDING, MessageConstants.FALSE);
+    	String migrateIndexes = properties.getProperty(ConfigConstants.MIGRATEINDEXES, MessageConstants.FALSE);
+    	String exportJSONDump = properties.getProperty(ConfigConstants.EXPORTJSONDUMP, MessageConstants.FALSE);
+    	String jsonDumpFilePath = properties.getProperty(ConfigConstants.JSONDUMPFILEPATH);
+    	String jsonDumpFileName = properties.getProperty(ConfigConstants.JSONDUMPFILENAME);
     	String inventoryFileName = properties.getProperty(ConfigConstants.INVENTORYFILENAME);
     	String inventoryFilePath = properties.getProperty(ConfigConstants.INVENTORYFILEPATH); 
-    	String hostName = properties.getProperty(ConfigConstants.HOSTNAME, ConfigConstants.LOCALHOST);
-    	String migrateIndexes = properties.getProperty(ConfigConstants.MIGRATEINDEXES); 
-    	String migrationMode = properties.getProperty(ConfigConstants.MIGRATIONMODE);
-    	String migrateSystemSchema = properties.getProperty(ConfigConstants.MIGRATESYSTEMSCHEMA);
-    	String password = properties.getProperty(ConfigConstants.PASSWORD);
-    	String schemaToMigrate = properties.getProperty(ConfigConstants.SCHEMATOMIGRATE).toUpperCase();
-    	String sourceDatabasePassword = properties.getProperty(ConfigConstants.SOURCEDATABASEPASSWORD); 
-    	String sourceDatabase = properties.getProperty(ConfigConstants.SOURCEDATABASE);
-    	String sourceDatabasePort = properties.getProperty(ConfigConstants.SOURCEDATABASEPORT);  
-    	String sourceDatabaseUsername = properties.getProperty(ConfigConstants.SOURCEDATABASEUSERNAME);
-    	String targetDatabase = properties.getProperty(ConfigConstants.TARGETDATABASE); 
-    	String targetDatabasePassword = properties.getProperty(ConfigConstants.TARGETDATABASEPASSWORD); 
-    	String targetDatabasePort = properties.getProperty(ConfigConstants.TARGETDATABASEPORT, MigratorConstants.MONGODEFAULTPORT); 
-    	String targetDatabaseUserName = properties.getProperty(ConfigConstants.TARGETDATABASEUSERNAME);
-    	String user = properties.getProperty(ConfigConstants.USER);
-        
-    	configMap.put(ConfigConstants.DATAINJECTIONMODE, dataInjectionMode);
-    	configMap.put(ConfigConstants.DATAINJECTIONRANGE, dataInjectionRange);
-    	configMap.put(ConfigConstants.HOSTNAME, hostName);
-    	configMap.put(ConfigConstants.INVENTORYFILENAME, inventoryFileName);
-    	configMap.put(ConfigConstants.INVENTORYFILEPATH, inventoryFilePath); 
-    	configMap.put(ConfigConstants.MIGRATEINDEXES, migrateIndexes); 
+    	String logFilePath = properties.getProperty(ConfigConstants.LOGFILEPATH);
+    	String logFileName = properties.getProperty(ConfigConstants.LOGFILENAME);
+        String dataInjectionMode = properties.getProperty(ConfigConstants.DATAINJECTIONMODE, MessageConstants.FALSE);
+    	String dataInjectionRange = properties.getProperty(ConfigConstants.DATAINJECTIONRANGE, "0");
+    	 
+    	
     	configMap.put(ConfigConstants.MIGRATIONMODE, migrationMode);
-    	configMap.put(ConfigConstants.MIGRATESYSTEMSCHEMA, migrateSystemSchema);
-    	configMap.put(ConfigConstants.PASSWORD, password);
-    	configMap.put(ConfigConstants.SCHEMATOMIGRATE, schemaToMigrate);
-    	configMap.put(ConfigConstants.SOURCEDATABASEPASSWORD, sourceDatabasePassword); 
+    	configMap.put(ConfigConstants.HOSTNAME, hostName);
     	configMap.put(ConfigConstants.SOURCEDATABASE, sourceDatabase);
     	configMap.put(ConfigConstants.SOURCEDATABASEPORT, sourceDatabasePort);  
     	configMap.put(ConfigConstants.SOURCEDATABASEUSERNAME, sourceDatabaseUsername);
-    	configMap.put(ConfigConstants.TARGETDATABASE, targetDatabase); 
-    	configMap.put(ConfigConstants.TARGETDATABASEPASSWORD, targetDatabasePassword); 
-    	configMap.put(ConfigConstants.TARGETDATABASEPORT, targetDatabasePort); 
+    	configMap.put(ConfigConstants.SOURCEDATABASEPASSWORD, sourceDatabasePassword);
+    	configMap.put(ConfigConstants.SCHEMATOMIGRATE, schemaToMigrate);
+    	configMap.put(ConfigConstants.MIGRATESYSTEMSCHEMA, migrateSystemSchema);
+    	configMap.put(ConfigConstants.TARGETDATABASE, targetDatabase);
+    	configMap.put(ConfigConstants.TARGETDATABASEPORT, targetDatabasePort);
+    	configMap.put(ConfigConstants.TARGETDATABASENAME, targetDatabaseName);
     	configMap.put(ConfigConstants.TARGETDATABASEUSERNAME, targetDatabaseUserName);
-    	configMap.put(ConfigConstants.USER, user);
+    	configMap.put(ConfigConstants.TARGETDATABASEPASSWORD, targetDatabasePassword);
+    	configMap.put(ConfigConstants.EMBEDDING, embedding);
+    	configMap.put(ConfigConstants.MIGRATEINDEXES, migrateIndexes);
+    	configMap.put(ConfigConstants.EXPORTJSONDUMP, exportJSONDump);
+    	configMap.put(ConfigConstants.JSONDUMPFILEPATH, jsonDumpFilePath);
+    	configMap.put(ConfigConstants.JSONDUMPFILENAME, jsonDumpFileName);
+    	configMap.put(ConfigConstants.INVENTORYFILEPATH, inventoryFilePath);
+    	configMap.put(ConfigConstants.INVENTORYFILENAME, inventoryFileName);
+    	configMap.put(ConfigConstants.LOGFILEPATH, logFilePath);
+    	configMap.put(ConfigConstants.LOGFILENAME, logFileName);
+    	configMap.put(ConfigConstants.DATAINJECTIONMODE, dataInjectionMode);
+    	configMap.put(ConfigConstants.DATAINJECTIONRANGE, dataInjectionRange);
     	
-    	String sourceDatabaseName = fetchDatabaseName();
-    	configMap.put(ConfigConstants.SOURCEDATABASENAME, sourceDatabaseName);
+    	configMapInitialized=true;
     	
-        printConfigDetails(configMap);
-         
+    	if(EnvironmentSettings.DEBUGMODEV) {
+    	  PrintUtil.log(MessageConstants.DEBUGV + MigratorConstants.CONFIGMAP);
+    	  PrintUtil.log(PatternConstants.TABSPACING + configMap);
+    	}
+    	
 		return configMap;
 	}
 
@@ -101,18 +115,15 @@ public class ConfigManager {
 	 * @return DatabaseName
 	 */
 	private static String fetchDatabaseName() {
-		ResultSet rs = OracleQueryExecutor.execute("SELECT " + OraQueryConstants.ORA_DATABASE_NAME + " FROM " + OraQueryConstants.DUAL);
+		ResultSet rs = OracleQueryExecutor.execute("SELECT " + OraTables.ORA_DATABASE_NAME + " FROM " + OraTables.DUAL);
 		String databaseName = null;
 		try {
 			while(rs.next()) {
 				databaseName = rs.getString(1).toUpperCase();
 			}
 		} catch (SQLException e) {
-			InventoryManager.log(MessageConstants.EXCEPTIONWHILE + " fetching Database Name: " + e.getMessage(), MessageType.ERROR);
+			InventoryManager.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + " fetching Database Name: " + e.getMessage(), MessageType.ERROR);
 			e.printStackTrace();
-		}
-		if(EnvironmentSettings.DEBUG) {
-			System.out.println(ConfigConstants.SOURCEDATABASENAME + PatternConstants.DATASEPERATOR + databaseName);
 		}
 		return databaseName;
 	}
@@ -121,40 +132,74 @@ public class ConfigManager {
 	 * This module will print Configuration Details to Console.
 	 * @param configMap
 	 */
-	private static void printConfigDetails(Map<String, String> configMap) {
-		System.out.println("\n\t***** Validating Inputs ******\n");
-        System.out.println("*** MigrationMode - - - - - - - - - [ " + configMap.get(ConfigConstants.MIGRATIONMODE) + " ]");
-        System.out.println("*** SourceDatabase - - - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASE) + " ]");
-        System.out.println("*** SourceDatabasePort - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPORT) + " ]");
-        System.out.println("*** SourceDatabaseUsername- - - - - [ " + configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME) + " ]");
-        System.out.println("*** SourceDatabasePassword - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPASSWORD) + " ]");
-        System.out.println("*** TargetDatabase - - - - - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASE) + " ]");
-        System.out.println("*** TargetDatabasePort- - - - - - - [ " + configMap.get(ConfigConstants.TARGETDATABASEPORT) + " ]");
-        System.out.println("*** TargetDatabaseUsername - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASEUSERNAME) + " ]");
-        System.out.println("*** TargetDatabasePassword - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASEPASSWORD) + " ]");
-        System.out.println("*** MigrateIndexes - - - - - - - - -[ " + configMap.get(ConfigConstants.MIGRATEINDEXES) + " ]");
-        System.out.println("*** SchemaToMigrate - - - - - - - - [ " + configMap.get(ConfigConstants.SCHEMATOMIGRATE) + " ]");
-        System.out.println("*** InventoryFilePath - - - - - - - [ " + configMap.get(ConfigConstants.INVENTORYFILEPATH) + " ]");
-        System.out.println("*** Operating Sytem - - - - - - - - [ " + System.getProperty(ConfigConstants.OSNAME) + " ]");
-        System.out.println("*** DataInjectionMode - - - - - - - [ " + configMap.get(ConfigConstants.DATAINJECTIONMODE) + " ]");
-        System.out.println("*** DataInjectionRange - - - - - - -[ " + configMap.get(ConfigConstants.DATAINJECTIONRANGE) + " ]");
-        System.out.println();
-        if(EnvironmentSettings.DEBUG) {
-    		System.out.println(DebugConstants.DEBUG + "Debug Mode Enabled" + PatternConstants.DOUBLELINESEPERATOR);
+	static void printConfigDetails(Map<String, String> configMap) {
+    
+		PrintUtil.log(PatternConstants.LINESEPERATOR + PatternConstants.TABSPACING+ MigratorConstants.VALIDATINGINPUTS + PatternConstants.LINESEPERATOR);
+        PrintUtil.log("*** MigrationMode - - - - - - - - - [ " + configMap.get(ConfigConstants.MIGRATIONMODE) + " ]");
+        PrintUtil.log("*** SourceDatabase - - - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASE) + " ]");
+        PrintUtil.log("*** SourceDatabasePort - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPORT) + " ]");
+        PrintUtil.log("*** SourceDatabaseUsername- - - - - [ " + configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME) + " ]");
+        PrintUtil.log("*** SourceDatabasePassword - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPASSWORD) + " ]");
+        PrintUtil.log("*** SchemaToMigrate - - - - - - - - [ " + configMap.get(ConfigConstants.SCHEMATOMIGRATE) + " ]");
+        PrintUtil.log("*** MigrateSystemSchema - - - - - - [ " + configMap.get(ConfigConstants.MIGRATESYSTEMSCHEMA) + " ]");
+        PrintUtil.log("*** TargetDatabase - - - - - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASE) + " ]");
+        PrintUtil.log("*** TargetDatabasePort- - - - - - - [ " + configMap.get(ConfigConstants.TARGETDATABASEPORT) + " ]");
+        PrintUtil.log("*** TargetDatabaseName - - - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASENAME) + " ]");
+        PrintUtil.log("*** TargetDatabaseUserName - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASEUSERNAME) + " ]");
+        PrintUtil.log("*** TargetDatabasePassword - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASEPASSWORD) + " ]");
+        PrintUtil.log("*** Embedded JSON- - - - - - - - - -[ " + configMap.get(ConfigConstants.EMBEDDING) + " ]");
+        PrintUtil.log("*** MigrateIndexes - - - - - - - - -[ " + configMap.get(ConfigConstants.MIGRATEINDEXES) + " ]");
+        PrintUtil.log("*** ExportJSONDump - - - - - - - - -[ " + configMap.get(ConfigConstants.EXPORTJSONDUMP) + " ]");
+        if(Boolean.valueOf(configMap.get(ConfigConstants.EXPORTJSONDUMP))) {
+        	PrintUtil.log("*** JSONDumpFilePath - - - - - - - -[ " + configMap.get(ConfigConstants.JSONDUMPFILEPATH)+" ]");
+        	PrintUtil.log("*** JSONDumpFileName - - - - - - - -[ " + configMap.get(ConfigConstants.JSONDUMPFILENAME)+" ]");
+        }
+        PrintUtil.log("*** InventoryFilePath - - - - - - - [ " + configMap.get(ConfigConstants.INVENTORYFILEPATH) + " ]");
+        PrintUtil.log("*** InventoryFileName - - - - - - - [ " + configMap.get(ConfigConstants.INVENTORYFILENAME) + " ]");
+        PrintUtil.log("*** Operating Sytem - - - - - - - - [ " + System.getProperty(ConfigConstants.OSNAME) + " ]");
+        PrintUtil.log("*** DataInjectionMode - - - - - - - [ " + configMap.get(ConfigConstants.DATAINJECTIONMODE) + " ]");
+        PrintUtil.log("*** DataInjectionRange - - - - - - -[ " + configMap.get(ConfigConstants.DATAINJECTIONRANGE) + " ]");
+        
+        PrintUtil.log(PatternConstants.LINESEPERATOR);
+        
+    	populateDatabaseName();
+    	
+        if(EnvironmentSettings.DEBUGMODE) {
+    		PrintUtil.log(MessageConstants.INFO + "Debug Mode Enabled" + PatternConstants.LINESEPERATORDOUBLE);
     	}
         
         if(configMap.get(ConfigConstants.SCHEMATOMIGRATE).equals(PatternConstants.ASTERIK)) {
         	if(!configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME).startsWith("SYS")) {
-        		System.out.print("ERROR: ");
-        		System.out.println("To migrate all the schemas, USER running this tool has to be " + MigratorConstants.SYS + " or " + MigratorConstants.SYSTEM);
-        		System.out.println("Exiting...");
+        		System.out.print(MessageConstants.ERROR);
+        		PrintUtil.log("To migrate all the schemas, USER running this tool has to be " + MigratorConstants.SYS + " or " + MigratorConstants.SYSTEM);
+        		PrintUtil.log(MessageConstants.EXITING);
         		System.exit(1);
         	}
         }
+	}
+
+	/**
+	 * @param configMap
+	 */
+	private static void populateDatabaseName() {
+		String sourceDatabaseName = fetchDatabaseName();
+    	configMap.put(ConfigConstants.SOURCEDATABASENAME, sourceDatabaseName);
+    	if(null==configMap.get(ConfigConstants.TARGETDATABASENAME)) {
+    		configMap.put(ConfigConstants.TARGETDATABASENAME, sourceDatabaseName);
+    	}
 	}	
 	
-	public static Map<String, String> getConfigMap() {
-		return configMap;
+	static Map<String, String> getConfigMap() {
+		if(configMapInitialized)
+			return configMap;
+		else
+			throw new RuntimeException(MigratorConstants.CONFIGMAP + PatternConstants.SPACESEPERATOR + MessageConstants.NOTINITIALIZED);
 	}
 	
+	static Properties getConfigProperties() {
+		if(propertiesInitialized)
+			return properties;
+		else
+			throw new RuntimeException(MigratorConstants.PROPERTIES + PatternConstants.SPACESEPERATOR + MessageConstants.NOTINITIALIZED);
+	}
 }

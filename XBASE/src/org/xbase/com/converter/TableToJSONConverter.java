@@ -6,10 +6,14 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import org.xbase.com.environment.EnvironmentSettings;
-import org.xbase.com.executor.OracleQueryExecutor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.xbase.com.constants.MessageConstants;
+import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.PatternConstants;
+import org.xbase.com.environment.EnvironmentSettings;
+import org.xbase.com.executor.OracleQueryExecutor;
+import org.xbase.com.util.PrintUtil;
 
 public class TableToJSONConverter {
 
@@ -26,25 +30,33 @@ public class TableToJSONConverter {
 		try {
 			int columnCount = resultSetMetaData.getColumnCount();
 			
-			if(EnvironmentSettings.DEBUG) {
-				out.println("Column Count: " + columnCount + "\n");
+			if(EnvironmentSettings.DEBUGMODE) {
+				PrintUtil.log(MessageConstants.DEBUG + MigratorConstants.COLUMNCOUNT + PatternConstants.DATASEPERATOR + columnCount + PatternConstants.LINESEPERATOR);
 			}
-			
+			if(EnvironmentSettings.DEBUGMODEV) {
+				PrintUtil.log(MessageConstants.DEBUGV);
+			}
 			for (int i = 1; i <= columnCount; i++) {
 				String currentColumnName = resultSetMetaData.getColumnName(i);
-				out.print(currentColumnName + " | ");
+				// This will print column name and following code will print info in columns
+				if (EnvironmentSettings.DEBUGMODEV) {	
+					out.print(PatternConstants.TABSPACING + currentColumnName + " | ");
+				}
 			}
 			
-			out.println();
+		
 			
 			while (resultSet.next()) {
 				JSONObject jsonObject = new JSONObject();
 				for (int i = 1; i <= columnCount; i++) {
 					jsonObject.put(resultSetMetaData.getColumnName(i), resultSet.getString(i));
-					out.print(resultSet.getString(i) + " | ");
+					// This will print info present in columns
+					if(EnvironmentSettings.DEBUGMODEV)
+						out.print(PatternConstants.TABSPACING + resultSet.getString(i) + " | ");
 				}
 				jsonArray.put(jsonObject);
-				out.println();
+				if(EnvironmentSettings.DEBUGMODEV)
+					PrintUtil.log(PatternConstants.LINESEPERATOR);
 			}
 			
 		} catch (SQLException sqle) {

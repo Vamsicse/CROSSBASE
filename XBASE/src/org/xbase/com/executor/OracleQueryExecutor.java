@@ -6,31 +6,32 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import org.xbase.com.constants.DebugConstants;
 import org.xbase.com.constants.MessageConstants;
 import org.xbase.com.constants.PatternConstants;
-import org.xbase.com.manager.MigrationManager;
-
-import static java.lang.System.out;
+import org.xbase.com.environment.EnvironmentSettings;
+import org.xbase.com.manager.OracleConnectionManager;
+import org.xbase.com.util.PrintUtil;
 
 public class OracleQueryExecutor {
 
-	public static ResultSet execute(Connection conn, String query) {
+	public static ResultSet execute(Connection conn, final String query) {
 		PreparedStatement pstmt = null;
 		ResultSet resultSet = null;
 		try {
 			pstmt = conn.prepareStatement(query);
-			System.out.println(DebugConstants.DEBUG + PatternConstants.SPACESEPERATOR + query);
+			if(EnvironmentSettings.DEBUGMODE) {
+				PrintUtil.log(MessageConstants.DEBUG + OracleQueryExecutor.class.getName() + PatternConstants.DATASEPERATOR + query);
+			}
 			resultSet = pstmt.executeQuery();
 		} catch (SQLException sqle) {
-			out.println(sqle.getMessage());
+			PrintUtil.log(sqle.getMessage());
 			sqle.printStackTrace();
 		}
 		return resultSet;
 	}
 	
 	public static ResultSet execute(String query) {
-		Connection conn = MigrationManager.getOracleConnection();
+		Connection conn = OracleConnectionManager.getInstance().getOracleDBConnection();
 		return execute(conn, query);
 	}	
 	
@@ -40,7 +41,7 @@ public class OracleQueryExecutor {
 			resultSetMetadata = resultSet.getMetaData();
 		}
 		catch(SQLException sqle) {
-			out.println(MessageConstants.EXCEPTIONWHILE + " getting ResultSetMetaData: " + sqle.getMessage());
+			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + " getting ResultSetMetaData: " + sqle.getMessage());
 			sqle.printStackTrace();
 		}
 		return resultSetMetadata;

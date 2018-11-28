@@ -1,8 +1,8 @@
 package org.xbase.com.manager;
 
-import static java.lang.System.out;
-
+import org.xbase.com.constants.MessageConstants;
 import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.util.PrintUtil;
 
 import com.mongodb.MongoClient;
 
@@ -26,7 +26,7 @@ public class MongoConnectionManager {
 
 		// MongoCredential credential = MongoCredential.createCredential("sampleUser","myDb", "password".toCharArray());
 		
-		out.println("Connected to the Mongo database...\n");
+		PrintUtil.log(MessageConstants.INFO + "Connected to the Mongo database...\n");
 		return mongo;
 	}
 }

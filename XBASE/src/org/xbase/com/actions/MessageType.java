@@ -8,5 +8,5 @@ package org.xbase.com.actions;
  *
  */
 public enum MessageType {
-	ERROR, INFO, WARNING;
+	DEBUG, DEBUGV, ERROR, INFO, WARNING ;
 }

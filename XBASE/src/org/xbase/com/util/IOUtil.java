@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.xbase.com.constants.MessageConstants;
 import org.xbase.com.environment.EnvironmentSettings;
 
 /**
@@ -22,7 +23,10 @@ public class IOUtil {
 	}
 
 	public static boolean writeToFile(String path, String fileName, String content) {
-
+		
+		if("".equals(content)) {
+			System.out.println(MessageConstants.WARNING + fileName +" Content is empty");
+		}
 		boolean success = true;
 		FileWriter fw = null;
 		BufferedWriter bw = null;
@@ -40,8 +44,8 @@ public class IOUtil {
 			}
 
 			fw = new FileWriter(outputFile.getAbsoluteFile());
-			if (EnvironmentSettings.DEBUG) {
-				System.out.println("   -- [DEBUG] Output file -> " + outputFile.getAbsoluteFile());
+			if (EnvironmentSettings.DEBUGMODE) {
+				System.out.println(MessageConstants.DEBUG + "Output file -> " + outputFile.getAbsoluteFile());
 			}
 
 			bw = new BufferedWriter(fw);
@@ -90,7 +94,7 @@ public class IOUtil {
 			}
 
 			fr = new FileReader(inputFile.getAbsoluteFile());
-			if (EnvironmentSettings.DEBUG) {
+			if (EnvironmentSettings.DEBUGMODE) {
 				System.out.println("   -- [DEBUG] Input file -> " + inputFile.getAbsoluteFile());
 			}
 			br = new BufferedReader(fr);

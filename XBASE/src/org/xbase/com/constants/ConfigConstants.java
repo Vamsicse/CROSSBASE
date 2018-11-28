@@ -12,10 +12,17 @@ public interface ConfigConstants {
 	public static final String DATAINJECTIONMODE = "DataInjectionMode";
 	public static final String DATAINJECTIONRANGE = "DataInjectionRange";
 	public static final String DEBUGMODE = "DebugMode";
+	public static final String DEBUGMODEV = "DebugModeV";
+	public static final String EMBEDDING = "Embedding";
+	public static final String EXPORTJSONDUMP = "ExportJSONDump";
 	public static final String HOSTNAME = "HostName";
 	public static final String INVENTORYFILENAME = "InventoryFileName";
-	public static final String INVENTORYFILEPATH = "InventoryFilePath"; 
+	public static final String INVENTORYFILEPATH = "InventoryFilePath";
+	public static final String JSONDUMPFILEPATH = "JSONDumpFilePath";
+	public static final String JSONDUMPFILENAME = "JSONDumpFileName";
 	public static final String LOCALHOST = "localhost";
+	public static final String LOGFILEPATH = "LogFilePath";
+	public static final String LOGFILENAME = "LogFileName";
 	public static final String MIGRATEINDEXES = "MigrateIndexes"; 
 	public static final String MIGRATESYSTEMSCHEMA = "MigrateSystemSchema";
 	public static final String MIGRATIONMODE = "MigrationMode";
@@ -28,6 +35,7 @@ public interface ConfigConstants {
 	public static final String SOURCEDATABASEPORT = "SourceDatabasePort";  
 	public static final String SOURCEDATABASEUSERNAME = "SourceDatabaseUsername";
 	public static final String TARGETDATABASE = "TargetDatabase"; 
+	public static final String TARGETDATABASENAME = "TargetDatabaseName";
 	public static final String TARGETDATABASEPASSWORD = "TargetDatabasePassword"; 
 	public static final String TARGETDATABASEPORT = "TargetDatabasePort"; 
 	public static final String TARGETDATABASEUSERNAME = "TargetDatabaseUserName";

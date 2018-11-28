@@ -1,19 +1,19 @@
 package org.xbase.com.manager;
 
-import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Properties;
 
 import org.xbase.com.constants.ConfigConstants;
+import org.xbase.com.constants.MessageConstants;
 import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.PatternConstants;
+import org.xbase.com.util.PrintUtil;
 
 public class OracleConnectionManager {
 
-	private static OracleConnectionManager oracleConnectionManager = new OracleConnectionManager();
-	private static Map<String, String> configMap = ConfigManager.getConfigMap();
+	private static OracleConnectionManager oracleConnectionManager = new OracleConnectionManager(); 
 	private static Connection connection = null;
 
 	private OracleConnectionManager() {
@@ -30,25 +30,25 @@ public class OracleConnectionManager {
 	public Connection getOracleDBConnection() {
 		try {
 			if (null == connection) {
-				Properties properties = new Properties();
-				properties.put(ConfigConstants.USER, configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME));
-				properties.put(ConfigConstants.PASSWORD, configMap.get(ConfigConstants.SOURCEDATABASEPASSWORD));
+				Properties configProperties = new Properties();
+				configProperties = ConfigManager.getConfigProperties();
+				configProperties.put(ConfigConstants.USER, configProperties.get(ConfigConstants.SOURCEDATABASEUSERNAME));
+				configProperties.put(ConfigConstants.PASSWORD, configProperties.get(ConfigConstants.SOURCEDATABASEPASSWORD));
 				// Sample URL: "jdbc:oracle:thin:@localhost:1521:orcl";
-				String connectionURL = MigratorConstants.JDBCORACLETHIN + configMap.get(ConfigConstants.HOSTNAME) + ":"
-						+ configMap.get(ConfigConstants.SOURCEDATABASEPORT) + ":" + MigratorConstants.ORCL;
-				out.println("Trying to establish connection over: [" + connectionURL + "]");
-				// load and register, establish db connection
-				// connection = DriverManager.getConnection(MigratorConstants.ORACLEDRIVERORCL,
-				// properties);
-				connection = DriverManager.getConnection(connectionURL, properties);
+				String connectionURL = MigratorConstants.JDBCORACLETHIN + configProperties.get(ConfigConstants.HOSTNAME) + PatternConstants.COLON
+						+ configProperties.get(ConfigConstants.SOURCEDATABASEPORT) + PatternConstants.COLON + MigratorConstants.ORCL;
+				PrintUtil.log(MessageConstants.INFO + MigratorConstants.CONNECTIONTRYMESSAGE + PatternConstants.DATASEPERATOR + "[" + connectionURL + "]");
+				// Load and register, establish db connection
+				// connection = DriverManager.getConnection(MigratorConstants.ORACLEDRIVERORCL,properties);
+				connection = DriverManager.getConnection(connectionURL, configProperties);
 				if (connection != null) {
-					out.println("Connection Successful..!\n");
+					PrintUtil.log(MessageConstants.INFO + MigratorConstants.CONNECTIONSUCCESSFUL + PatternConstants.LINESEPERATOR);
 				} else {
-					out.println("Failed to make connection!");
+					PrintUtil.log(MessageConstants.ERROR + MigratorConstants.CONNECTIONFAILURE + PatternConstants.LINESEPERATOR);
 				}
 			}
 		} catch (SQLException e) {
-			out.println("Oracle JDBC Driver not found. Please use ojdbc7.jar");
+			PrintUtil.log(MessageConstants.ERROR + "JDBC Driver not found. Please use respective jar. " + "Eg. ojdbc7.jar for Oracle");
 			e.printStackTrace();
 		}
 		return connection;
