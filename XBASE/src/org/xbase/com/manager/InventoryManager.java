@@ -27,16 +27,18 @@ public class InventoryManager {
 	private static StringBuilder inventoryLog = new StringBuilder();
 	private static long startTime, duration, seconds, minutes;
 	private static long collectionsCreated, collectionsDeleted, collectionsEmbedded, databasesCreated, databasesDeleted;
-	private static long indexesCreated, indexesDeleted, schemasCreated, schemasDeleted;
+	private static long indexesCreated, indexesDeleted, schemasCreated, schemasDeleted, viewsCreated, viewsDeleted;
 	private static List<String> createdCollectionList = new ArrayList<String>();
 	private static List<String> createdDatabaseList = new ArrayList<String>();
 	private static List<String> createdIndexList = new ArrayList<String>();
 	private static List<String> createdSchemaList = new ArrayList<String>();
+	private static List<String> createdViewList = new ArrayList<String>();
 	private static List<String> deletedCollectionList = new ArrayList<String>();
 	private static List<String> deletedDatabaseList = new ArrayList<String>();
 	private static List<String> deletedIndexList = new ArrayList<String>();
 	private static List<String> deletedSchemaList = new ArrayList<String>();
-	private static List<String> embeddedCollectionsList = new ArrayList<String>();
+	private static List<String> deletedViewList = new ArrayList<String>();
+	private static List<String> embeddedCollectionList = new ArrayList<String>();
 	
 	/**
 	 * This method will be invoked when the migration begins
@@ -65,23 +67,39 @@ public class InventoryManager {
 	 * Invoke this method at the end.
 	 * */
 	public static void writeInventoryToLog() {
+		
 		inventoryLog.append(ActionConstants.DATABASESCREATED + PatternConstants.DATASEPERATOR + databasesCreated + PatternConstants.LINESEPERATOR);
 		for(String currentDatabase : createdDatabaseList)
 			inventoryLog.append(PatternConstants.TABSPACING + currentDatabase + PatternConstants.LINESEPERATOR);
+		
 		inventoryLog.append(ActionConstants.SCHEMASCREATED + PatternConstants.DATASEPERATOR + schemasCreated + PatternConstants.LINESEPERATOR);
 		for(String currentSchema : createdSchemaList)
 			inventoryLog.append(PatternConstants.TABSPACING + currentSchema + PatternConstants.LINESEPERATOR);
+		
 		inventoryLog.append(ActionConstants.COLLECTIONSCREATED + PatternConstants.DATASEPERATOR + collectionsCreated + PatternConstants.LINESEPERATOR);
 		for(String currentCollection : createdCollectionList)
 			inventoryLog.append(PatternConstants.TABSPACING + currentCollection + PatternConstants.LINESEPERATOR);
-		inventoryLog.append(ActionConstants.INDEXESCREATED + PatternConstants.DATASEPERATOR + indexesCreated + PatternConstants.LINESEPERATORDOUBLE);
 		
+		inventoryLog.append(ActionConstants.COLLECTIONSEMBEDDED + PatternConstants.DATASEPERATOR + collectionsEmbedded + PatternConstants.LINESEPERATOR);
+		for(String currentEmbeddedCollection : embeddedCollectionList)
+			inventoryLog.append(PatternConstants.TABSPACING + currentEmbeddedCollection + PatternConstants.LINESEPERATOR);
 		
+		inventoryLog.append(ActionConstants.VIEWSCREATED + PatternConstants.DATASEPERATOR + viewsCreated + PatternConstants.LINESEPERATOR);
+		for(String currentView : createdViewList)
+			inventoryLog.append(PatternConstants.TABSPACING + currentView + PatternConstants.LINESEPERATOR);
+		
+		inventoryLog.append(ActionConstants.INDEXESCREATED + PatternConstants.DATASEPERATOR + indexesCreated + PatternConstants.LINESEPERATOR);
+		for(String currentIndex : createdIndexList)
+			inventoryLog.append(PatternConstants.TABSPACING + currentIndex + PatternConstants.LINESEPERATOR);
 		
 		inventoryLog.append(ActionConstants.COLLECTIONSDELETED + PatternConstants.DATASEPERATOR + collectionsDeleted + PatternConstants.LINESEPERATOR);
 		inventoryLog.append(ActionConstants.INDEXESDELETED + PatternConstants.DATASEPERATOR + indexesDeleted + PatternConstants.LINESEPERATOR);
 		inventoryLog.append(ActionConstants.SCHEMASDELETED + PatternConstants.DATASEPERATOR + schemasDeleted + PatternConstants.LINESEPERATOR);
-		inventoryLog.append(ActionConstants.DATABASESDELETED + PatternConstants.DATASEPERATOR + databasesDeleted + PatternConstants.LINESEPERATORDOUBLE);
+		inventoryLog.append(ActionConstants.DATABASESDELETED + PatternConstants.DATASEPERATOR + databasesDeleted + PatternConstants.LINESEPERATOR);
+		
+		inventoryLog.append(ActionConstants.VIEWSDELETED + PatternConstants.DATASEPERATOR + viewsDeleted + PatternConstants.LINESEPERATOR);
+		for(String currentView : deletedViewList)
+			inventoryLog.append(PatternConstants.TABSPACING + currentView + PatternConstants.LINESEPERATOR);
 		
 		inventoryLog.append(PatternConstants.LINEPATTERNHIPHEN + PatternConstants.LINESEPERATOR);
 	}
@@ -95,6 +113,10 @@ public class InventoryManager {
 			createdIndexList.add(objectName);
 			indexesCreated++;
 		}
+		else if(currentAction.equals(MigratorActions.VIEWCREATED)) {
+			createdViewList.add(objectName);
+			viewsCreated++;
+		}
 		else if(currentAction.equals(MigratorActions.SCHEMACREATED)) {
 			createdSchemaList.add(objectName);
 			schemasCreated++;
@@ -106,6 +128,14 @@ public class InventoryManager {
 		else if(currentAction.equals(MigratorActions.COLLECTIONDELETED)) {
 			deletedCollectionList.add(objectName);
 			collectionsDeleted++;
+		}
+		else if(currentAction.equals(MigratorActions.COLLECTIONEMBEDDED)) {
+			embeddedCollectionList.add(objectName);
+			collectionsEmbedded++;
+		}
+		else if(currentAction.equals(MigratorActions.VIEWDELETED)) {
+			deletedViewList.add(objectName);
+			viewsDeleted++;
 		}
 		else if(currentAction.equals(MigratorActions.SCHEMADELETED)) {
 			deletedSchemaList.add(objectName);

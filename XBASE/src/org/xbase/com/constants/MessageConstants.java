@@ -13,7 +13,7 @@ public interface MessageConstants {
 
 		public static final String CHILDTABLES = "Child Tables";
 		public static final String CURRENTQUERY = "Current Query: ";
-		public static final String EXCEPTIONWHILE = "Exception while";
+		public static final String EXCEPTIONWHILE = "Exception while ";
 		public static final String EXITING = "Exiting...!";
 		public static final String FALSE = "false";
 		public static final String NOTINITIALIZED =  "Not yet Initialized";

@@ -31,7 +31,7 @@ public class OracleQueryExecutor {
 	}
 	
 	public static ResultSet execute(String query) {
-		Connection conn = OracleConnectionManager.getInstance().getOracleDBConnection();
+		Connection conn = OracleConnectionManager.getOracleDBConnection();
 		return execute(conn, query);
 	}	
 	

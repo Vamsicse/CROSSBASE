@@ -10,6 +10,8 @@ import org.xbase.com.constants.QueryConstants;
 import org.xbase.com.environment.EnvironmentSettings;
 import org.xbase.com.manager.InventoryManager;
 import org.xbase.com.manager.MongoConnectionManager;
+import org.xbase.com.object.Index;
+import org.xbase.com.object.View;
 import org.xbase.com.util.PrintUtil;
 
 import com.mongodb.DB;
@@ -17,12 +19,14 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 
 public class MongoQueryExecutor {
 		
 	private static DB db;
-	private static MongoDatabase mongoDB;
-	private static MongoClient mongo = MongoConnectionManager.getInstance().getMongoClientHandle();
+	private static MongoDatabase mongoDatabase;
+	private static MongoClient mongoClient = MongoConnectionManager.getInstance().getMongoClientHandle();
 	private static MongoQueryExecutor mongoQueryExecutor = new MongoQueryExecutor();
 	
 	private MongoQueryExecutor() {}		
@@ -34,7 +38,7 @@ public class MongoQueryExecutor {
 	 * This method will create Database
 	 */
 	public void createDatabase(String databaseName) {
-		mongoDB = mongo.getDatabase(databaseName);
+		mongoDatabase = mongoClient.getDatabase(databaseName);
 		if(EnvironmentSettings.DEBUGMODE) {
 			PrintUtil.log(MessageConstants.INFO + QueryConstants.DATABASECREATED + PatternConstants.DATASEPERATOR + databaseName);
 		}
@@ -45,9 +49,8 @@ public class MongoQueryExecutor {
 	 * This method will create Collection/Table in Database
 	 */
 	public void createCollection(String databaseName, String collectionName) {	
-		
-		mongoDB = mongo.getDatabase(databaseName);
-		mongoDB.createCollection(collectionName);
+		mongoDatabase = mongoClient.getDatabase(databaseName);
+		mongoDatabase.createCollection(collectionName);
 		if(EnvironmentSettings.DEBUGMODE) {
 			//PrintUtil.log("Current Collection Name:\t" + db.getCollectionNames());
 			PrintUtil.log(MessageConstants.INFO + MongoQueryConstants.COLLECTIONCREATED + PatternConstants.DATASEPERATOR + collectionName);
@@ -59,10 +62,35 @@ public class MongoQueryExecutor {
 	 * This method will create Documents/Records in target Collection/Table
 	 */
 	public void createDocuments(String databaseName, String collectionName, JSONArray documents) {
-		MongoCollection<Document> collection = mongoDB.getCollection(collectionName);
+		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
 		
 		for(int i=0 ; i<documents.length() ; i++) {
 		   collection.insertOne(Document.parse(documents.get(i).toString()));
+		}
+	}
+	
+	/*
+	 * This method will create Documents/Records in target Collection/Table
+	 */
+	public void createIndex(String databaseName, String collectionName, Index currentIndex) {
+		mongoDatabase = mongoClient.getDatabase(databaseName);
+		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+		IndexOptions indexOptions = new IndexOptions();
+		indexOptions.unique(currentIndex.isUniqueIndex());
+		indexOptions.name(currentIndex.getIndexName());
+		if(currentIndex.isReverseIndex()) {
+			collection.createIndex(Indexes.descending(currentIndex.getColumns()), indexOptions);
+		}
+		else {
+			collection.createIndex(Indexes.ascending(currentIndex.getColumns()), indexOptions);
+		}	
+		InventoryManager.updateInventory(MigratorActions.INDEXCREATED, currentIndex.getIndexName());
+	}	
+	
+	public void listCollectionIndexes(String collectionName) {
+		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+		for (Document index : collection.listIndexes()) {
+		    System.out.println(index.toJson());
 		}
 	}
 	
@@ -71,23 +99,46 @@ public class MongoQueryExecutor {
 	 */
 	public void printCollection(String databaseName, String collectionName) {
 		// db = mongo.getDB(databaseName);
-		mongoDB = mongo.getDatabase(databaseName);
-		MongoCollection<Document> collection = mongoDB.getCollection(collectionName);
+		mongoDatabase = mongoClient.getDatabase(databaseName);
+		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
 		PrintUtil.log(collection.toString());
 	}
 
 	public void dropCollection(String databaseName, String collectionName)
 	{
-		// db = mongo.getDB(databaseName);
-		mongoDB = mongo.getDatabase(databaseName);
-		
+		mongoDatabase = mongoClient.getDatabase(databaseName);	
 		DBCollection collection = db.getCollection(collectionName);
 		collection.drop();
 		if(EnvironmentSettings.DEBUGMODE) {
-			//PrintUtil.log("Current Collection Name:\t" + db.getCollectionNames());
 			PrintUtil.log("Deleting Collection:\t" + collectionName);
 		}
 		InventoryManager.updateInventory(MigratorActions.COLLECTIONDELETED, collectionName);
+	}
+	
+	/*
+	 * This method will createView
+	 */
+	public void createView(String databaseName, String collectionName, View currentView) {
+		mongoDatabase = mongoClient.getDatabase(databaseName);
+		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+		
+		
+		
+		
+		InventoryManager.updateInventory(MigratorActions.VIEWCREATED, currentView.getViewName());
+	}
+	
+	/*
+	 * This method will drop View
+	 */
+	public void dropView(String databaseName, String collectionName, View currentView) {
+		mongoDatabase = mongoClient.getDatabase(databaseName);
+		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+		
+		
+		
+		
+		InventoryManager.updateInventory(MigratorActions.VIEWDELETED, currentView.getViewName());
 	}
 	
 }

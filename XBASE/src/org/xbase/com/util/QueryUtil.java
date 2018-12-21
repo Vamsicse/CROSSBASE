@@ -19,7 +19,7 @@ import org.xbase.com.executor.OracleQueryExecutor;
  * @author VAMSI KRISHNA MYALAPALLI (vamsikrishna.vasu@gmail.com)
  *
  */
-public class QueryUtil {
+public final class QueryUtil {
 	/*
 	 * This method prepares query using PreparedStatement
 	 */
@@ -152,12 +152,13 @@ public class QueryUtil {
 		query.append("SELECT ");
 		int columnListSize = columnList.size(); 
 		for(int i=0; i<columnListSize ; i++) {
+			query.append(currentTableName);
+			query.append(PatternConstants.DOTSEPERATOR);
 			query.append(columnList.get(i));
 			if(i<columnListSize-1) {
 				query.append(", ");
 			}
 		}
-		
 		query.append(" FROM ").append(currentTableName);
 		query.append(" JOIN ");
 		query.append(parentTableName);
@@ -179,13 +180,42 @@ public class QueryUtil {
 		return query.toString();
 	}
 	
-	public static final String getQueryToListAColumn(String tableName, String columnName) {
+	public static final String getQueryToListAColumn(final String tableName, final String columnName) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT ");		
 		query.append(columnName);
 		query.append(" FROM ");
 		query.append(tableName);
 		
+		return query.toString();
+	}
+
+	/**
+	 * @param currentTableName
+	 * @return
+	 */
+	public static final String getQueryToFindListofIndexes(final String tableName) {
+		StringBuilder query = new StringBuilder();
+		 // Sample -> SELECT INDEX_NAME, INDEX_TYPE, TABLE_NAME, UNIQUENESS FROM USER_INDEXES WHERE TABLE_NAME='HUNTING';
+		query.append("SELECT INDEX_NAME, INDEX_TYPE, TABLE_NAME, UNIQUENESS FROM USER_INDEXES WHERE TABLE_NAME='");
+		query.append(tableName);
+		query.append("'");
+		return query.toString();
+	}
+
+	/**
+	 * @param currentTableName
+	 * @param currentIndexName
+	 * @return
+	 */
+	public static final String getQueryToFindColumnsInIndex(String currentTableName, String currentIndexName) {
+		StringBuilder query = new StringBuilder();
+		 //  Sample - SELECT COLUMN_NAME FROM USER_IND_COLUMNS WHERE TABLE_NAME = 'HUNTING' AND INDEX_NAME='HUNTINGINDXID';
+		query.append("SELECT COLUMN_NAME FROM USER_IND_COLUMNS WHERE TABLE_NAME = '");
+		query.append(currentTableName);
+		query.append("' AND INDEX_NAME='");
+		query.append(currentIndexName);
+		query.append("'");
 		return query.toString();
 	}
 	

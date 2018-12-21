@@ -44,15 +44,17 @@ public class TableToJSONConverter {
 				}
 			}
 			
-		
-			
 			while (resultSet.next()) {
 				JSONObject jsonObject = new JSONObject();
 				for (int i = 1; i <= columnCount; i++) {
-					jsonObject.put(resultSetMetaData.getColumnName(i), resultSet.getString(i));
+					String currentValue = resultSet.getString(i);
+					if(null==currentValue) {
+						currentValue = "";
+					}
+					jsonObject.put(resultSetMetaData.getColumnName(i), currentValue);
 					// This will print info present in columns
 					if(EnvironmentSettings.DEBUGMODEV)
-						out.print(PatternConstants.TABSPACING + resultSet.getString(i) + " | ");
+						out.print(PatternConstants.TABSPACING + currentValue + " | ");
 				}
 				jsonArray.put(jsonObject);
 				if(EnvironmentSettings.DEBUGMODEV)

@@ -22,6 +22,7 @@ import org.xbase.com.converter.TableToJSONConverter;
 import org.xbase.com.environment.EnvironmentSettings;
 import org.xbase.com.executor.MongoQueryExecutor;
 import org.xbase.com.executor.OracleQueryExecutor;
+import org.xbase.com.object.Table;
 import org.xbase.com.util.PrintUtil;
 import org.xbase.com.util.QueryUtil;
 
@@ -32,16 +33,22 @@ import com.mongodb.MongoCommandException;
  *
  */
 public class TableMigrator {
-	
-	private TableMigrator() {}
+
+	private TableMigrator() {
+	}
 
 	private static List<String> childTables = new ArrayList<String>();
-	
-	public static void migrate(Connection conn, Map<String,String> configMap) {
-		
-		String schemaToMigrate = configMap.get(ConfigConstants.SCHEMATOMIGRATE);
-		System.out.print(MessageConstants.INFO + ConfigConstants.SCHEMATOMIGRATE + PatternConstants.DATASEPERATOR + PatternConstants.SINGLEQUOTE);
+
+	public static void migrate(Connection conn, Map<String, String> configMap) {
+
+		boolean embeddingEnabled = Boolean.valueOf(configMap.get(ConfigConstants.EMBEDDING));
 		List<String> schemaList = new ArrayList<String>();
+		MongoQueryExecutor mongoQE = MongoQueryExecutor.getInstance();
+		String schemaToMigrate = configMap.get(ConfigConstants.SCHEMATOMIGRATE);
+		String targetDatabaseName = configMap.get(ConfigConstants.TARGETDATABASENAME);
+
+		System.out.print(MessageConstants.INFO + ConfigConstants.SCHEMATOMIGRATE + PatternConstants.DATASEPERATOR
+				+ PatternConstants.SINGLEQUOTE);
 		if (schemaToMigrate.equals("*")) {
 			PrintUtil.log("All");
 			schemaList = populateListFromQuery(conn, QueryConstants.SCHEMA, schemaToMigrate);
@@ -49,23 +56,24 @@ public class TableMigrator {
 			schemaList.add(schemaToMigrate);
 			PrintUtil.log(schemaToMigrate + PatternConstants.SINGLEQUOTE);
 		}
-		MongoQueryExecutor mongoQE = MongoQueryExecutor.getInstance();
-		String targetDatabaseName = configMap.get(ConfigConstants.TARGETDATABASENAME);
+
 		mongoQE.createDatabase(targetDatabaseName);
-		boolean embeddingEnabled = Boolean.valueOf(configMap.get(ConfigConstants.EMBEDDING));
+
 		for (String currentSchema : schemaList) {
 			List<String> tableList = new ArrayList<String>();
 			tableList = populateListFromQuery(conn, QueryConstants.TABLE, schemaToMigrate);
-			PrintUtil.log(MessageConstants.INFO + MigratorConstants.TABLESTOMIGRATE + PatternConstants.DATASEPERATOR + tableList);
+			PrintUtil.log(MessageConstants.INFO + MigratorConstants.TABLESTOMIGRATE + PatternConstants.DATASEPERATOR
+					+ tableList);
 			for (String currentTableName : tableList) {
+				Table currentTable = new Table(currentTableName);
 				String currentAbsTableName = currentSchema + PatternConstants.DOTSEPERATOR + currentTableName;
 				PrintUtil.log(MessageConstants.INFO + "Current Table: " + currentAbsTableName);
-				int rowCount = QueryUtil.findNumberofParentTables(currentTableName);
-				if(rowCount>0) {
+				currentTable.setRowCount(QueryUtil.findNumberofParentTables(currentTable.getName()));
+				if (currentTable.getRowCount() > 0) {
 					PrintUtil.log(MessageConstants.DEBUG + currentAbsTableName + " has a parent.");
 					childTables.add(currentAbsTableName);
 				}
-				if(childTables.contains(currentAbsTableName) && embeddingEnabled) {
+				if (childTables.contains(currentAbsTableName) && embeddingEnabled) {
 					PrintUtil.log(PatternConstants.LINESEPERATOR);
 					continue;
 				}
@@ -73,56 +81,59 @@ public class TableMigrator {
 				ResultSet resultSet = OracleQueryExecutor.execute(conn, query);
 				JSONArray jsonArray = TableToJSONConverter.getJSON(resultSet);
 
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 				Map<String, String> childTableDetails = QueryUtil.childTableDetails(currentTableName);
-				
-				boolean hasChildTable = childTableDetails.size()>0 ? true : false;
-				
-				// If hasChildTable is set to true, then we need to embed child entries
-				if(hasChildTable) {
-					PrintUtil.log(MessageConstants.DEBUG + currentTableName + " has a child table");
-					PrintUtil.log(MessageConstants.DEBUG + "Child Table Details: " + childTableDetails);
-					if(embeddingEnabled) {
+
+				boolean hasChildTable = childTableDetails.size() > 0 ? true : false;
+
+				// If 'hasChildTable' is set to true, then we need to embed child entries
+				if (hasChildTable) {
+					if (EnvironmentSettings.DEBUGMODE) {
+						PrintUtil.log(MessageConstants.DEBUG + currentTableName + " has a child table");
+						PrintUtil.log(MessageConstants.DEBUG + "Child Table Details: " + childTableDetails);
+					}
+					if (embeddingEnabled) {
 						jsonArray = EmbedHelper.embed(jsonArray, currentTableName, childTableDetails);
 					}
 				}
-				
-				
-				
-				
-				
-				
-				
+
 				int currentRowCount = jsonArray.length();
 				if (EnvironmentSettings.DEBUGMODEV) {
 					PrintUtil.log(MessageConstants.DEBUGV + "Row Count: " + currentRowCount);
 					if (currentRowCount > 0)
 						PrintUtil.log(PatternConstants.LINESEPERATOR + jsonArray.toString(8));
 				}
-				try {
-				mongoQE.createCollection(targetDatabaseName, currentTableName);
-				mongoQE.createDocuments(targetDatabaseName, currentTableName, jsonArray);
-				// mongoQE.printCollection(databaseName, collectionName);
-				}
-				catch(MongoCommandException mce) {
-					PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + "creating object in Mongo Database");
-					mce.printStackTrace();
-				}
+				createCollectionAndDocumentsInTargetDB(targetDatabaseName, currentTableName, jsonArray);
+				IndexMigrator.migrateIndexes(targetDatabaseName, currentTableName);
 				PrintUtil.log(PatternConstants.LINESEPERATOR);
 			}
 		}
 		PrintUtil.log(PatternConstants.LINESEPERATOR);
-		PrintUtil.log(MessageConstants.DEBUG + MessageConstants.CHILDTABLES + PatternConstants.DATASEPERATOR + childTables);
+		PrintUtil.log(
+				MessageConstants.DEBUG + MessageConstants.CHILDTABLES + PatternConstants.DATASEPERATOR + childTables);
 	}
+
+
+
+	/**
+	 * @param mongoQE
+	 * @param targetDatabaseName
+	 * @param currentTableName
+	 * @param jsonArray
+	 */
+	private static void createCollectionAndDocumentsInTargetDB(String targetDatabaseName, String currentTableName, JSONArray jsonArray) {
+		MongoQueryExecutor mongoQE = MongoQueryExecutor.getInstance();
+		try {
+			mongoQE.createCollection(targetDatabaseName, currentTableName);
+			mongoQE.createDocuments(targetDatabaseName, currentTableName, jsonArray);
+			// mongoQE.printCollection(databaseName, collectionName);
+		} catch (MongoCommandException mce) {
+			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE
+					+ "creating object in Mongo Database");
+			mce.printStackTrace();
+		}
+	}
+	
+	
 
 	/**
 	 * @param conn
@@ -131,23 +142,22 @@ public class TableMigrator {
 	private static List<String> populateListFromQuery(Connection conn, String objectType, String schemaToMigrate) {
 		List<String> schemaList = new ArrayList<String>();
 		String query = null;
-		if(QueryConstants.SCHEMA.equals(objectType)) {
+		if (QueryConstants.SCHEMA.equals(objectType)) {
 			query = "SELECT USERNAME FROM " + OraTables.DBA_USERS;
-		}
-		else if (QueryConstants.TABLE.equals(objectType)){
+		} else if (QueryConstants.TABLE.equals(objectType)) {
 			query = "SELECT TABLE_NAME FROM " + OraTables.ALL_TABLES + " WHERE OWNER='" + schemaToMigrate + "'";
-		}
-		else {
+		} else {
 			throw new RuntimeException("Unknown Object Type. Cannot populate Schema/Table List");
 		}
 		ResultSet resultSet = OracleQueryExecutor.execute(conn, query);
 		try {
-			while(resultSet.next())
+			while (resultSet.next())
 				schemaList.add(resultSet.getString(1).toUpperCase());
 		} catch (SQLException e) {
-			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + " finding schema list: " + e.getMessage());
+			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + "finding schema list: "
+					+ e.getMessage());
 			e.printStackTrace();
 		}
 		return schemaList;
-	}	
+	}
 }

@@ -41,6 +41,7 @@ public class ConfigManager {
         InputStream inputStream = new FileInputStream(configFilePath);
         properties.load(inputStream);
         propertiesInitialized=true;
+        
         try {
         	EnvironmentSettings.DEBUGMODE = Boolean.valueOf(properties.getProperty(ConfigConstants.DEBUGMODE, "false"));
         	EnvironmentSettings.DEBUGMODEV = Boolean.valueOf(properties.getProperty(ConfigConstants.DEBUGMODEV, "false"));

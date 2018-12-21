@@ -27,7 +27,7 @@ public class OracleConnectionManager {
 	 * This method will establish connection to Oracle Database and returns the
 	 * connection
 	 */
-	public Connection getOracleDBConnection() {
+	public static Connection getOracleDBConnection() {
 		try {
 			if (null == connection) {
 				Properties configProperties = new Properties();
