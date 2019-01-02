@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.MessageConstants;
 import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.ObjectConstants;
 import org.xbase.com.constants.OraTables;
 import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.constants.QueryConstants;
@@ -34,8 +35,7 @@ import com.mongodb.MongoCommandException;
  */
 public class TableMigrator {
 
-	private TableMigrator() {
-	}
+	private TableMigrator() {}
 
 	private static List<String> childTables = new ArrayList<String>();
 
@@ -51,7 +51,7 @@ public class TableMigrator {
 				+ PatternConstants.SINGLEQUOTE);
 		if (schemaToMigrate.equals("*")) {
 			PrintUtil.log("All");
-			schemaList = populateListFromQuery(conn, QueryConstants.SCHEMA, schemaToMigrate);
+			schemaList = populateListFromQuery(conn, ObjectConstants.SCHEMA, schemaToMigrate);
 		} else {
 			schemaList.add(schemaToMigrate);
 			PrintUtil.log(schemaToMigrate + PatternConstants.SINGLEQUOTE);
@@ -61,7 +61,7 @@ public class TableMigrator {
 
 		for (String currentSchema : schemaList) {
 			List<String> tableList = new ArrayList<String>();
-			tableList = populateListFromQuery(conn, QueryConstants.TABLE, schemaToMigrate);
+			tableList = populateListFromQuery(conn, ObjectConstants.TABLE, schemaToMigrate);
 			PrintUtil.log(MessageConstants.INFO + MigratorConstants.TABLESTOMIGRATE + PatternConstants.DATASEPERATOR
 					+ tableList);
 			for (String currentTableName : tableList) {
@@ -112,8 +112,6 @@ public class TableMigrator {
 				MessageConstants.DEBUG + MessageConstants.CHILDTABLES + PatternConstants.DATASEPERATOR + childTables);
 	}
 
-
-
 	/**
 	 * @param mongoQE
 	 * @param targetDatabaseName
@@ -127,8 +125,7 @@ public class TableMigrator {
 			mongoQE.createDocuments(targetDatabaseName, currentTableName, jsonArray);
 			// mongoQE.printCollection(databaseName, collectionName);
 		} catch (MongoCommandException mce) {
-			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE
-					+ "creating object in Mongo Database");
+			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + "creating object in Mongo Database");
 			mce.printStackTrace();
 		}
 	}
@@ -142,9 +139,9 @@ public class TableMigrator {
 	private static List<String> populateListFromQuery(Connection conn, String objectType, String schemaToMigrate) {
 		List<String> schemaList = new ArrayList<String>();
 		String query = null;
-		if (QueryConstants.SCHEMA.equals(objectType)) {
+		if (ObjectConstants.SCHEMA.equals(objectType)) {
 			query = "SELECT USERNAME FROM " + OraTables.DBA_USERS;
-		} else if (QueryConstants.TABLE.equals(objectType)) {
+		} else if (ObjectConstants.TABLE.equals(objectType)) {
 			query = "SELECT TABLE_NAME FROM " + OraTables.ALL_TABLES + " WHERE OWNER='" + schemaToMigrate + "'";
 		} else {
 			throw new RuntimeException("Unknown Object Type. Cannot populate Schema/Table List");

@@ -57,22 +57,22 @@ public class ConfigManager {
         String sourceDatabaseUsername = properties.getProperty(ConfigConstants.SOURCEDATABASEUSERNAME);
         String sourceDatabasePassword = properties.getProperty(ConfigConstants.SOURCEDATABASEPASSWORD);
         String schemaToMigrate = properties.getProperty(ConfigConstants.SCHEMATOMIGRATE).toUpperCase();
-        String migrateSystemSchema = properties.getProperty(ConfigConstants.MIGRATESYSTEMSCHEMA, MessageConstants.FALSE);
+        String migrateSystemSchema = properties.getProperty(ConfigConstants.MIGRATESYSTEMSCHEMA, ConfigConstants.FALSE);
         String targetDatabase = properties.getProperty(ConfigConstants.TARGETDATABASE); 
         String targetDatabasePort = properties.getProperty(ConfigConstants.TARGETDATABASEPORT, MigratorConstants.MONGODEFAULTPORT);
         String targetDatabaseName = properties.getProperty(ConfigConstants.TARGETDATABASENAME);
     	String targetDatabaseUserName = properties.getProperty(ConfigConstants.TARGETDATABASEUSERNAME);
     	String targetDatabasePassword = properties.getProperty(ConfigConstants.TARGETDATABASEPASSWORD); 
-    	String embedding = properties.getProperty(ConfigConstants.EMBEDDING, MessageConstants.FALSE);
-    	String migrateIndexes = properties.getProperty(ConfigConstants.MIGRATEINDEXES, MessageConstants.FALSE);
-    	String exportJSONDump = properties.getProperty(ConfigConstants.EXPORTJSONDUMP, MessageConstants.FALSE);
+    	String embedding = properties.getProperty(ConfigConstants.EMBEDDING, ConfigConstants.FALSE);
+    	String migrateIndexes = properties.getProperty(ConfigConstants.MIGRATEINDEXES, ConfigConstants.FALSE);
+    	String exportJSONDump = properties.getProperty(ConfigConstants.EXPORTJSONDUMP, ConfigConstants.FALSE);
     	String jsonDumpFilePath = properties.getProperty(ConfigConstants.JSONDUMPFILEPATH);
     	String jsonDumpFileName = properties.getProperty(ConfigConstants.JSONDUMPFILENAME);
     	String inventoryFileName = properties.getProperty(ConfigConstants.INVENTORYFILENAME);
     	String inventoryFilePath = properties.getProperty(ConfigConstants.INVENTORYFILEPATH); 
     	String logFilePath = properties.getProperty(ConfigConstants.LOGFILEPATH);
     	String logFileName = properties.getProperty(ConfigConstants.LOGFILENAME);
-        String dataInjectionMode = properties.getProperty(ConfigConstants.DATAINJECTIONMODE, MessageConstants.FALSE);
+        String dataInjectionMode = properties.getProperty(ConfigConstants.DATAINJECTIONMODE, ConfigConstants.FALSE);
     	String dataInjectionRange = properties.getProperty(ConfigConstants.DATAINJECTIONRANGE, "0");
     	 
     	

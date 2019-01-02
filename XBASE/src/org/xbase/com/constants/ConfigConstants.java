@@ -15,6 +15,7 @@ public interface ConfigConstants {
 	public static final String DEBUGMODEV = "DebugModeV";
 	public static final String EMBEDDING = "Embedding";
 	public static final String EXPORTJSONDUMP = "ExportJSONDump";
+	public static final String FALSE = "false";
 	public static final String HOSTNAME = "HostName";
 	public static final String INVENTORYFILENAME = "InventoryFileName";
 	public static final String INVENTORYFILEPATH = "InventoryFilePath";
@@ -39,6 +40,7 @@ public interface ConfigConstants {
 	public static final String TARGETDATABASEPASSWORD = "TargetDatabasePassword"; 
 	public static final String TARGETDATABASEPORT = "TargetDatabasePort"; 
 	public static final String TARGETDATABASEUSERNAME = "TargetDatabaseUserName";
+	public static final String TRUE = "true";
 	public static final String USER = "user";
 	
 }

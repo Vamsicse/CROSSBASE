@@ -17,9 +17,7 @@ public interface QueryConstants {
 	public static final String NONUNIQUE = "NONUNIQUE";
 	public static final String NORMAL = "NORMAL";
 	public static final String NORMAL_REV = "NORMAL/REV";
-	public static final String SCHEMA = "SCHEMA";
 	public static final String SIMPLEFTS = "SELECT * FROM ";
-	public static final String TABLE = "TABLE";
 	public static final String TABLECREATED = "Table Created";
 	public static final String TABLE_NAME = "TABLE_NAME";
 	public static final String UNIQUENESS = "UNIQUENESS";
