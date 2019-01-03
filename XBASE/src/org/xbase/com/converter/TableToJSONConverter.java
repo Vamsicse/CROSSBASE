@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.xbase.com.constants.MessageConstants;
-import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.environment.EnvironmentSettings;
 import org.xbase.com.executor.OracleQueryExecutor;
@@ -31,7 +31,7 @@ public class TableToJSONConverter {
 			int columnCount = resultSetMetaData.getColumnCount();
 			
 			if(EnvironmentSettings.DEBUGMODE) {
-				PrintUtil.log(MessageConstants.DEBUG + MigratorConstants.COLUMNCOUNT + PatternConstants.DATASEPERATOR + columnCount + PatternConstants.LINESEPERATOR);
+				PrintUtil.log(MessageConstants.DEBUG + XBASEConstants.COLUMNCOUNT + PatternConstants.DATASEPERATOR + columnCount + PatternConstants.LINESEPERATOR);
 			}
 			if(EnvironmentSettings.DEBUGMODEV) {
 				PrintUtil.log(MessageConstants.DEBUGV);

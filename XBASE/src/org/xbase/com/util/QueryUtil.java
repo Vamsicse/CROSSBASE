@@ -24,31 +24,27 @@ public final class QueryUtil {
 	 * This method prepares query using PreparedStatement
 	 */
 	public static final String getQueryToFindDependentTables(final String parentTableName) {
-		
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT FK.OWNER, FK.TABLE_NAME, COL.COLUMN_NAME FROM ALL_CONSTRAINTS PK JOIN ALL_CONSTRAINTS FK");
-		query.append(" ON PK.CONSTRAINT_NAME = FK.R_CONSTRAINT_NAME AND FK.CONSTRAINT_TYPE = 'R' JOIN ALL_CONS_COLUMNS COL ");
-		query.append("ON FK.CONSTRAINT_NAME = COL.CONSTRAINT_NAME WHERE PK.TABLE_NAME = '");
+		query.append(" ON PK.CONSTRAINT_NAME=FK.R_CONSTRAINT_NAME AND FK.CONSTRAINT_TYPE='R' JOIN ALL_CONS_COLUMNS COL ");
+		query.append("ON FK.CONSTRAINT_NAME=COL.CONSTRAINT_NAME WHERE PK.TABLE_NAME='");
 		query.append(parentTableName);
-		query.append("' AND PK.CONSTRAINT_TYPE = 'P'");
-		
+		query.append("' AND PK.CONSTRAINT_TYPE='P'");
 		return query.toString();
 	}
 	
 	public static final String getQueryToFindDependentIndexes(final String tableName) {
 		StringBuilder query = new StringBuilder();
-		
 		return query.toString();
 	}
 	
 	public static final String getQueryToFindListOfParentTables(final String childTableName) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT C_PK.TABLE_NAME FROM USER_CONS_COLUMNS A JOIN USER_CONSTRAINTS C ");
-		query.append("ON A.OWNER = C.OWNER AND A.CONSTRAINT_NAME = C.CONSTRAINT_NAME JOIN ALL_CONSTRAINTS C_PK ");
-		query.append("ON C.R_CONSTRAINT_NAME = C_PK.CONSTRAINT_NAME WHERE C.CONSTRAINT_TYPE = 'R' AND A.TABLE_NAME = '");
+		query.append("ON A.OWNER=C.OWNER AND A.CONSTRAINT_NAME=C.CONSTRAINT_NAME JOIN ALL_CONSTRAINTS C_PK ");
+		query.append("ON C.R_CONSTRAINT_NAME=C_PK.CONSTRAINT_NAME WHERE C.CONSTRAINT_TYPE='R' AND A.TABLE_NAME='");
 		query.append(childTableName);
 		query.append("'");
-		
 		return query.toString();
 	}
 
@@ -101,12 +97,11 @@ public final class QueryUtil {
 	public static final String getQueryToFindChildTables(String parentTableName) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT FK.TABLE_NAME, COL.COLUMN_NAME FROM USER_CONSTRAINTS PK JOIN USER_CONSTRAINTS FK ");
-		query.append("ON PK.CONSTRAINT_NAME = FK.R_CONSTRAINT_NAME AND FK.CONSTRAINT_TYPE = 'R' JOIN ALL_CONS_COLUMNS COL ");
-		query.append("ON FK.CONSTRAINT_NAME = COL.CONSTRAINT_NAME ");
-		query.append("WHERE PK.TABLE_NAME = '");
+		query.append("ON PK.CONSTRAINT_NAME=FK.R_CONSTRAINT_NAME AND FK.CONSTRAINT_TYPE='R' JOIN ALL_CONS_COLUMNS COL ");
+		query.append("ON FK.CONSTRAINT_NAME=COL.CONSTRAINT_NAME ");
+		query.append("WHERE PK.TABLE_NAME='");
 		query.append(parentTableName);
-		query.append("' AND PK.CONSTRAINT_TYPE = 'P'");
-		
+		query.append("' AND PK.CONSTRAINT_TYPE='P'");
 		return query.toString();
 	}
 
@@ -211,7 +206,7 @@ public final class QueryUtil {
 	public static final String getQueryToFindColumnsInIndex(String currentTableName, String currentIndexName) {
 		StringBuilder query = new StringBuilder();
 		 //  Sample - SELECT COLUMN_NAME FROM USER_IND_COLUMNS WHERE TABLE_NAME = 'HUNTING' AND INDEX_NAME='HUNTINGINDXID';
-		query.append("SELECT COLUMN_NAME FROM USER_IND_COLUMNS WHERE TABLE_NAME = '");
+		query.append("SELECT COLUMN_NAME FROM USER_IND_COLUMNS WHERE TABLE_NAME='");
 		query.append(currentTableName);
 		query.append("' AND INDEX_NAME='");
 		query.append(currentIndexName);

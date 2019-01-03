@@ -1,7 +1,7 @@
 package org.xbase.com.manager;
 
 import org.xbase.com.constants.MessageConstants;
-import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.util.PrintUtil;
 
 import com.mongodb.MongoClient;
@@ -19,7 +19,7 @@ public class MongoConnectionManager {
 	public MongoClient getMongoClientHandle() {
 		MongoClient mongo = null;
 		try {
-			mongo = new MongoClient(MigratorConstants.LOCALHOST, Integer.parseInt(MigratorConstants.MONGODEFAULTPORT));
+			mongo = new MongoClient(XBASEConstants.LOCALHOST, Integer.parseInt(XBASEConstants.MONGODEFAULTPORT));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -8,8 +8,7 @@ import java.util.Map;
 import org.xbase.com.actions.MessageType;
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.MessageConstants;
-import org.xbase.com.constants.MigratorConstants;
-import org.xbase.com.constants.PatternConstants;
+import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.migrator.DatabaseMigrator;
 import org.xbase.com.util.PrintUtil;
 
@@ -29,17 +28,20 @@ public class XBASEManager {
 			e.printStackTrace();
 		}
 		ConfigManager.printConfigDetails(configMap);
-		if(configMap.get(ConfigConstants.SOURCEDATABASE).equalsIgnoreCase(MigratorConstants.ORACLE)) {
+		if(configMap.get(ConfigConstants.SOURCEDATABASE).equalsIgnoreCase(XBASEConstants.ORACLE)) {
 		 conn = OracleConnectionManager.getOracleDBConnection();
 		}
 		if(Boolean.valueOf(configMap.get(ConfigConstants.MIGRATIONMODE))) {
 			DatabaseMigrator.migrate(conn, configMap);
 		}
+		InventoryManager.endMigration();
 		if(Boolean.valueOf(configMap.get(ConfigConstants.DATAINJECTIONMODE))) {
+			InventoryManager.startDataInjection();
 			String dataInjectionRanges = configMap.get(ConfigConstants.DATAINJECTIONRANGE);
 			DataInjectionManager.injectData(dataInjectionRanges);
+			InventoryManager.endDataInjection();
 		}
-		InventoryManager.endMigration(configMap.get(ConfigConstants.INVENTORYFILEPATH), configMap.get(ConfigConstants.INVENTORYFILENAME));
+		InventoryManager.createInventory(configMap.get(ConfigConstants.INVENTORYFILEPATH), configMap.get(ConfigConstants.INVENTORYFILENAME));
 		LogManager.logMigration(configMap.get(ConfigConstants.LOGFILEPATH), configMap.get(ConfigConstants.LOGFILENAME), PrintUtil.getLog());
 		OracleConnectionManager.getInstance().closeConnection(conn);
 	}

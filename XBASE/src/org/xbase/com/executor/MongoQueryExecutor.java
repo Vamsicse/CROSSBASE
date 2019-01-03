@@ -17,6 +17,7 @@ import org.xbase.com.util.PrintUtil;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
@@ -66,6 +67,24 @@ public class MongoQueryExecutor {
 		
 		for(int i=0 ; i<documents.length() ; i++) {
 		   collection.insertOne(Document.parse(documents.get(i).toString()));
+		}
+	}
+	
+	/**
+	 * @param mongoQE
+	 * @param targetDatabaseName
+	 * @param currentTableName
+	 * @param jsonArray
+	 */
+	public void createCollectionAndDocumentsInTargetDB(String targetDatabaseName, String currentTableName, JSONArray jsonArray) {
+		MongoQueryExecutor mongoQE = MongoQueryExecutor.getInstance();
+		try {
+			mongoQE.createCollection(targetDatabaseName, currentTableName);
+			mongoQE.createDocuments(targetDatabaseName, currentTableName, jsonArray);
+			// mongoQE.printCollection(databaseName, collectionName);
+		} catch (MongoCommandException mce) {
+			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + "creating object in Mongo Database");
+			mce.printStackTrace();
 		}
 	}
 	
@@ -134,9 +153,6 @@ public class MongoQueryExecutor {
 	public void dropView(String databaseName, String collectionName, View currentView) {
 		mongoDatabase = mongoClient.getDatabase(databaseName);
 		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
-		
-		
-		
 		
 		InventoryManager.updateInventory(MigratorActions.VIEWDELETED, currentView.getViewName());
 	}

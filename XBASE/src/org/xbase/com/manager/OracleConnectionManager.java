@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.MessageConstants;
-import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.util.PrintUtil;
 
@@ -35,16 +35,16 @@ public class OracleConnectionManager {
 				configProperties.put(ConfigConstants.USER, configProperties.get(ConfigConstants.SOURCEDATABASEUSERNAME));
 				configProperties.put(ConfigConstants.PASSWORD, configProperties.get(ConfigConstants.SOURCEDATABASEPASSWORD));
 				// Sample URL: "jdbc:oracle:thin:@localhost:1521:orcl";
-				String connectionURL = MigratorConstants.JDBCORACLETHIN + configProperties.get(ConfigConstants.HOSTNAME) + PatternConstants.COLON
-						+ configProperties.get(ConfigConstants.SOURCEDATABASEPORT) + PatternConstants.COLON + MigratorConstants.ORCL;
-				PrintUtil.log(MessageConstants.INFO + MigratorConstants.CONNECTIONTRYMESSAGE + PatternConstants.DATASEPERATOR + "[" + connectionURL + "]");
+				String connectionURL = XBASEConstants.JDBCORACLETHIN + configProperties.get(ConfigConstants.HOSTNAME) + PatternConstants.COLON
+						+ configProperties.get(ConfigConstants.SOURCEDATABASEPORT) + PatternConstants.COLON + XBASEConstants.ORCL;
+				PrintUtil.log(MessageConstants.INFO + XBASEConstants.CONNECTIONTRYMESSAGE + PatternConstants.DATASEPERATOR + "[" + connectionURL + "]");
 				// Load and register, establish db connection
 				// connection = DriverManager.getConnection(MigratorConstants.ORACLEDRIVERORCL,properties);
 				connection = DriverManager.getConnection(connectionURL, configProperties);
 				if (connection != null) {
-					PrintUtil.log(MessageConstants.INFO + MigratorConstants.CONNECTIONSUCCESSFUL + PatternConstants.LINESEPERATOR);
+					PrintUtil.log(MessageConstants.INFO + XBASEConstants.CONNECTIONSUCCESSFUL + PatternConstants.LINESEPERATOR);
 				} else {
-					PrintUtil.log(MessageConstants.ERROR + MigratorConstants.CONNECTIONFAILURE + PatternConstants.LINESEPERATOR);
+					PrintUtil.log(MessageConstants.ERROR + XBASEConstants.CONNECTIONFAILURE + PatternConstants.LINESEPERATOR);
 				}
 			}
 		} catch (SQLException e) {

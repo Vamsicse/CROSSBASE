@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import org.xbase.com.actions.MessageType;
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.MessageConstants;
-import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.constants.OraTables;
 import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.environment.EnvironmentSettings;
@@ -33,7 +33,7 @@ public class ConfigManager {
 	public static Map<String, String> populateConfigDetails(String[] configArgs) throws IOException {
     
         if (configArgs.length < 1) {
-            PrintUtil.log(PatternConstants.LINESEPERATOR + MigratorConstants.PROPERTYFILEMISSING + PatternConstants.LINESEPERATOR);
+            PrintUtil.log(PatternConstants.LINESEPERATOR + XBASEConstants.PROPERTYFILEMISSING + PatternConstants.LINESEPERATOR);
             System.exit(1);
         }
         
@@ -59,7 +59,7 @@ public class ConfigManager {
         String schemaToMigrate = properties.getProperty(ConfigConstants.SCHEMATOMIGRATE).toUpperCase();
         String migrateSystemSchema = properties.getProperty(ConfigConstants.MIGRATESYSTEMSCHEMA, ConfigConstants.FALSE);
         String targetDatabase = properties.getProperty(ConfigConstants.TARGETDATABASE); 
-        String targetDatabasePort = properties.getProperty(ConfigConstants.TARGETDATABASEPORT, MigratorConstants.MONGODEFAULTPORT);
+        String targetDatabasePort = properties.getProperty(ConfigConstants.TARGETDATABASEPORT, XBASEConstants.MONGODEFAULTPORT);
         String targetDatabaseName = properties.getProperty(ConfigConstants.TARGETDATABASENAME);
     	String targetDatabaseUserName = properties.getProperty(ConfigConstants.TARGETDATABASEUSERNAME);
     	String targetDatabasePassword = properties.getProperty(ConfigConstants.TARGETDATABASEPASSWORD); 
@@ -104,7 +104,7 @@ public class ConfigManager {
     	configMapInitialized=true;
     	
     	if(EnvironmentSettings.DEBUGMODEV) {
-    	  PrintUtil.log(MessageConstants.DEBUGV + MigratorConstants.CONFIGMAP);
+    	  PrintUtil.log(MessageConstants.DEBUGV + XBASEConstants.CONFIGMAP);
     	  PrintUtil.log(PatternConstants.TABSPACING + configMap);
     	}
     	
@@ -135,7 +135,7 @@ public class ConfigManager {
 	 */
 	static void printConfigDetails(Map<String, String> configMap) {
     
-		PrintUtil.log(PatternConstants.LINESEPERATOR + PatternConstants.TABSPACING+ MigratorConstants.VALIDATINGINPUTS + PatternConstants.LINESEPERATOR);
+		PrintUtil.log(PatternConstants.LINESEPERATOR + PatternConstants.TABSPACING+ XBASEConstants.VALIDATINGINPUTS + PatternConstants.LINESEPERATOR);
         PrintUtil.log("*** MigrationMode - - - - - - - - - [ " + configMap.get(ConfigConstants.MIGRATIONMODE) + " ]");
         PrintUtil.log("*** SourceDatabase - - - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASE) + " ]");
         PrintUtil.log("*** SourceDatabasePort - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPORT) + " ]");
@@ -172,7 +172,7 @@ public class ConfigManager {
         if(configMap.get(ConfigConstants.SCHEMATOMIGRATE).equals(PatternConstants.ASTERIK)) {
         	if(!configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME).startsWith("SYS")) {
         		System.out.print(MessageConstants.ERROR);
-        		PrintUtil.log("To migrate all the schemas, USER running this tool has to be " + MigratorConstants.SYS + " or " + MigratorConstants.SYSTEM);
+        		PrintUtil.log("To migrate all the schemas, USER running this tool has to be " + XBASEConstants.SYS + " or " + XBASEConstants.SYSTEM);
         		PrintUtil.log(MessageConstants.EXITING);
         		System.exit(1);
         	}
@@ -194,13 +194,13 @@ public class ConfigManager {
 		if(configMapInitialized)
 			return configMap;
 		else
-			throw new RuntimeException(MigratorConstants.CONFIGMAP + PatternConstants.SPACESEPERATOR + MessageConstants.NOTINITIALIZED);
+			throw new RuntimeException(XBASEConstants.CONFIGMAP + PatternConstants.SPACESEPERATOR + MessageConstants.NOTINITIALIZED);
 	}
 	
 	static Properties getConfigProperties() {
 		if(propertiesInitialized)
 			return properties;
 		else
-			throw new RuntimeException(MigratorConstants.PROPERTIES + PatternConstants.SPACESEPERATOR + MessageConstants.NOTINITIALIZED);
+			throw new RuntimeException(XBASEConstants.PROPERTIES + PatternConstants.SPACESEPERATOR + MessageConstants.NOTINITIALIZED);
 	}
 }

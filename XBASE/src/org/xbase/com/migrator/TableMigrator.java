@@ -13,7 +13,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.MessageConstants;
-import org.xbase.com.constants.MigratorConstants;
+import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.constants.ObjectConstants;
 import org.xbase.com.constants.OraTables;
 import org.xbase.com.constants.PatternConstants;
@@ -26,8 +26,6 @@ import org.xbase.com.executor.OracleQueryExecutor;
 import org.xbase.com.object.Table;
 import org.xbase.com.util.PrintUtil;
 import org.xbase.com.util.QueryUtil;
-
-import com.mongodb.MongoCommandException;
 
 /**
  * @author VAMSI KRISHNA MYALAPALLI (vamsikrishna.vasu@gmail.com)
@@ -62,7 +60,7 @@ public class TableMigrator {
 		for (String currentSchema : schemaList) {
 			List<String> tableList = new ArrayList<String>();
 			tableList = populateListFromQuery(conn, ObjectConstants.TABLE, schemaToMigrate);
-			PrintUtil.log(MessageConstants.INFO + MigratorConstants.TABLESTOMIGRATE + PatternConstants.DATASEPERATOR
+			PrintUtil.log(MessageConstants.INFO + XBASEConstants.TABLESTOMIGRATE + PatternConstants.DATASEPERATOR
 					+ tableList);
 			for (String currentTableName : tableList) {
 				Table currentTable = new Table(currentTableName);
@@ -102,7 +100,7 @@ public class TableMigrator {
 					if (currentRowCount > 0)
 						PrintUtil.log(PatternConstants.LINESEPERATOR + jsonArray.toString(8));
 				}
-				createCollectionAndDocumentsInTargetDB(targetDatabaseName, currentTableName, jsonArray);
+				mongoQE.createCollectionAndDocumentsInTargetDB(targetDatabaseName, currentTableName, jsonArray);
 				IndexMigrator.migrateIndexes(targetDatabaseName, currentTableName);
 				PrintUtil.log(PatternConstants.LINESEPERATOR);
 			}
@@ -112,25 +110,6 @@ public class TableMigrator {
 				MessageConstants.DEBUG + MessageConstants.CHILDTABLES + PatternConstants.DATASEPERATOR + childTables);
 	}
 
-	/**
-	 * @param mongoQE
-	 * @param targetDatabaseName
-	 * @param currentTableName
-	 * @param jsonArray
-	 */
-	private static void createCollectionAndDocumentsInTargetDB(String targetDatabaseName, String currentTableName, JSONArray jsonArray) {
-		MongoQueryExecutor mongoQE = MongoQueryExecutor.getInstance();
-		try {
-			mongoQE.createCollection(targetDatabaseName, currentTableName);
-			mongoQE.createDocuments(targetDatabaseName, currentTableName, jsonArray);
-			// mongoQE.printCollection(databaseName, collectionName);
-		} catch (MongoCommandException mce) {
-			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + "creating object in Mongo Database");
-			mce.printStackTrace();
-		}
-	}
-	
-	
 
 	/**
 	 * @param conn
