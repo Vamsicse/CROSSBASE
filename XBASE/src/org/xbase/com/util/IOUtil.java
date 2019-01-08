@@ -54,14 +54,14 @@ public class IOUtil {
 		} catch (IOException ioe) {
 			success = false;
 			ioe.printStackTrace();
-			System.out.println("!! Error - IOE occurred in catch block. " + ioe.getCause());
+			System.out.println(MessageConstants.ERROR + "IOE occurred in catch block. " + ioe.getCause());
 		} finally {
 			if (bw != null) {
 				try {
 					bw.close();
 				} catch (IOException ioe) {
 					ioe.printStackTrace();
-					System.out.println("!! IOE occurred in finally block.");
+					System.out.println(MessageConstants.ERROR + "IOE occurred in finally block.");
 				}
 			}
 			if (fw != null) {
@@ -69,7 +69,7 @@ public class IOUtil {
 					fw.close();
 				} catch (IOException ioe) {
 					ioe.printStackTrace();
-					System.out.println("   -- [DEBUG] IOE occurred in finally block.");
+					System.out.println(MessageConstants.ERROR + "IOE occurred in finally block.");
 				}
 			}
 		}
@@ -94,8 +94,8 @@ public class IOUtil {
 			}
 
 			fr = new FileReader(inputFile.getAbsoluteFile());
-			if (EnvironmentSettings.DEBUGMODE) {
-				System.out.println("   -- [DEBUG] Input file -> " + inputFile.getAbsoluteFile());
+			if (EnvironmentSettings.DEBUGMODEV) {
+				System.out.println(MessageConstants.DEBUGV + "Input file -> " + inputFile.getAbsoluteFile());
 			}
 			br = new BufferedReader(fr);
 
@@ -111,7 +111,7 @@ public class IOUtil {
 					br.close();
 				} catch (IOException ioe) {
 					ioe.printStackTrace();
-					System.out.println("   -- [DEBUG] br - IOE occurred in finally block.");
+					System.out.println(MessageConstants.ERROR + "IOE occurred in finally block.");
 				}
 			}
 			if (fr != null) {
@@ -119,7 +119,7 @@ public class IOUtil {
 					fr.close();
 				} catch (IOException ioe) {
 					ioe.printStackTrace();
-					System.out.println("   -- [DEBUG] fr - IOE occurred in finally block.");
+					System.out.println(MessageConstants.ERROR + "IOE occurred in finally block.");
 				}
 			}
 		}
@@ -135,7 +135,7 @@ public class IOUtil {
 			}
 
 		} catch (Exception ioe) {
-			System.out.println("   -- [DEBUG] br - IOE occurred in catch block.");
+			System.out.println(MessageConstants.ERROR + "IOE occurred in catch block.");
 		}
 		return true;
 	}

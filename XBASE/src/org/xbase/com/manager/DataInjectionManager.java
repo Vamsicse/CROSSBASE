@@ -3,8 +3,6 @@
  */
 package org.xbase.com.manager;
 
-import java.sql.Timestamp;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.xbase.com.constants.ConfigConstants;
@@ -22,6 +20,7 @@ public class DataInjectionManager {
 	 * @param dataInjectionRanges
 	 */
 	public static void injectData(String dataInjectionRanges) {
+		InventoryManager.startDataInjection();
 		PrintUtil.log(PatternConstants.LINEPATTERNASTERIK);
 		PrintUtil.log("Initiating " + ConfigConstants.DATAINJECTIONMODE);
 		PrintUtil.log(PatternConstants.LINEPATTERNASTERIK);
@@ -59,9 +58,10 @@ public class DataInjectionManager {
 			}
 			mongoQE.createCollectionAndDocumentsInTargetDB(ObjectConstants.INJDATADB, ObjectConstants.COLLECTION+coll, currentCollection);
 		}
-
+		InventoryManager.endDataInjection();
 	}
-
+	
+/*
 	public static String getRandomCollectionName() {
 		StringBuilder tableName = new StringBuilder();
 		tableName.append(ObjectConstants.COLLECTION);
@@ -93,5 +93,5 @@ public class DataInjectionManager {
 	public static String getTimeStamp() {
 		return new Timestamp(System.currentTimeMillis()).toString().replaceAll(" ", "_");
 	}
-	
+*/	
 }

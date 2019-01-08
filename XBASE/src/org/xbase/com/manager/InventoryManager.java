@@ -40,13 +40,17 @@ public class InventoryManager {
 	private static List<String> deletedViewList = new ArrayList<String>();
 	private static List<String> embeddedCollectionList = new ArrayList<String>();
 	
+	
+	public static void initiateXBASEInventory() {
+		inventoryLog.append(PatternConstants.TABSPACINGDOUBLE + XBASEConstants.XBASEREPORT + PatternConstants.LINESEPERATORDOUBLE);
+		inventoryLog.append(PatternConstants.LINEPATTERNASTERIK + PatternConstants.LINESEPERATOR);
+	}
+	
 	/**
 	 * This method will be invoked when the migration begins
 	 */
 	public static void startMigration() {
-		startTime = System.nanoTime();
-		inventoryLog.append(PatternConstants.TABSPACINGDOUBLE + XBASEConstants.XBASE + PatternConstants.SPACESEPERATOR + XBASEConstants.MIGRATIONREPORT + PatternConstants.LINESEPERATORDOUBLE);
-		inventoryLog.append(PatternConstants.LINEPATTERNASTERIK + PatternConstants.LINESEPERATOR);
+		startTime = System.nanoTime();	
 		inventoryLog.append(XBASEConstants.DATAMIGRATIONSTART + PatternConstants.DATASEPERATOR + PatternConstants.SPACESEPERATOR + getTimeStamp() + PatternConstants.LINESEPERATOR);
 		inventoryLog.append(PatternConstants.LINEPATTERNHIPHEN + PatternConstants.LINESEPERATOR);
 	}
@@ -56,7 +60,7 @@ public class InventoryManager {
 	 */
 	public static void startDataInjection() {
 		startTime = System.nanoTime();
-		inventoryLog.append(PatternConstants.TABSPACINGDOUBLE + XBASEConstants.XBASE + PatternConstants.SPACESEPERATOR + XBASEConstants.DATAINJECTIONREPORT + PatternConstants.LINESEPERATORDOUBLE);
+		// inventoryLog.append(PatternConstants.TABSPACINGDOUBLE + XBASEConstants.XBASE + PatternConstants.SPACESEPERATOR + XBASEConstants.DATAINJECTIONREPORT + PatternConstants.LINESEPERATORDOUBLE);
 		inventoryLog.append(PatternConstants.LINEPATTERNASTERIK + PatternConstants.LINESEPERATOR);
 		inventoryLog.append(XBASEConstants.DATAINJECTIONSTART + PatternConstants.DATASEPERATOR + PatternConstants.SPACESEPERATOR + getTimeStamp() + PatternConstants.LINESEPERATOR);
 		inventoryLog.append(PatternConstants.LINEPATTERNHIPHEN + PatternConstants.LINESEPERATOR);

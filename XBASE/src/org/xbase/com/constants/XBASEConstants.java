@@ -16,19 +16,27 @@ public interface XBASEConstants {
 	public static final String ELAPSEDTIME = "Elapsed Time";
 	public static final String INVENTORYFILE = "Inventory File";
 	public static final String JDBCORACLETHIN = "jdbc:oracle:thin:@";
+	public static final String JSON = "JSON";
 	public static final String LOCALHOST = "localhost";
 	public static final String MIGRATIONREPORT = "Migration Report";
 	public static final String MONGO = "Mongo";
     public static final String MONGODEFAULTPORT = "27017";
-	public static final String ORACLE = "oracle";
+    public static final String MYSQL = "MYSQL";
+	public static final String ORACLE = "ORACLE";
 	public static final String ORCL = "orcl";
 	public static final String PROPERTIES = "Properties";
 	public static final String PROPERTYFILEMISSING = "***** Please pass the location of XBASE.properties file. Exiting ******";
+	public static final String SQLSERVER = "SQLSERVER";
 	public static final String SYS = "SYS";
 	public static final String SYSTEM = "SYSTEM";
+	
 	public static final String TABLESTOMIGRATE = "Tables to Migrate";
 	public static final String VALIDATINGINPUTS = "***** Validating Inputs ******";
 	public static final String XBASE = "XBASE";
+	public static final String XBASEREPORT = "XBASE REPORT";
+	public static final String XMLFILEPATH = "XML File Path";
 	public static final String XE = "xe";
+	public static final String XML = "XML";
+	
 	
 }

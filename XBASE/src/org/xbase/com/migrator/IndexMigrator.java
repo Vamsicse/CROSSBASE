@@ -44,11 +44,12 @@ public class IndexMigrator {
 				}
 				String uniqueness = resultSet.getString(QueryConstants.UNIQUENESS);
 				
-				if(QueryConstants.NONUNIQUE.equals(uniqueness))
+				if(QueryConstants.NONUNIQUE.equals(uniqueness)) {
 					currentIndex.setUnique(false);
-				else
+				}
+				else {
 					currentIndex.setUnique(true);
-				
+				}
 				String queryToFindColList = QueryUtil.getQueryToFindColumnsInIndex(currentTableName, currentIndex.getIndexName());
 				ResultSet colListResultSet = OracleQueryExecutor.execute(queryToFindColList);
 				while(colListResultSet.next()) {

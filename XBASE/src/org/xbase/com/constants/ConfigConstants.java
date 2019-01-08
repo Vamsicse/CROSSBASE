@@ -9,6 +9,7 @@ public interface ConfigConstants {
 	
 	public static final String CONFIGFILEPATH = "ConfigFilePath";
 	public static final String CONFIGFILEPATHVALUE = "XBASE.properties";
+	public static final String DATABASEFILEPATH = "DatabaseFilePath";
 	public static final String DATAINJECTIONMODE = "DataInjectionMode";
 	public static final String DATAINJECTIONRANGE = "DataInjectionRange";
 	public static final String DEBUGMODE = "DebugMode";
@@ -33,6 +34,7 @@ public interface ConfigConstants {
 	public static final String SOURCEDATABASE = "SourceDatabase";
 	public static final String SOURCEDATABASENAME = "SourceDatabaseName";
 	public static final String SOURCEDATABASEPASSWORD = "SourceDatabasePassword"; 
+	public static final String SOURCEDATABASEPATH = "SourceDatabasePath";
 	public static final String SOURCEDATABASEPORT = "SourceDatabasePort";  
 	public static final String SOURCEDATABASEUSERNAME = "SourceDatabaseUsername";
 	public static final String TARGETDATABASE = "TargetDatabase"; 
@@ -42,5 +44,5 @@ public interface ConfigConstants {
 	public static final String TARGETDATABASEUSERNAME = "TargetDatabaseUserName";
 	public static final String TRUE = "true";
 	public static final String USER = "user";
-	
+	// public static final String XMLFilePath = "XMLFilePath";
 }

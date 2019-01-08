@@ -30,14 +30,7 @@ public class ConfigManager {
     private static Map<String,String> configMap = new TreeMap<String,String>();
     private static final Properties properties = new Properties();
     
-	public static Map<String, String> populateConfigDetails(String[] configArgs) throws IOException {
-    
-        if (configArgs.length < 1) {
-            PrintUtil.log(PatternConstants.LINESEPERATOR + XBASEConstants.PROPERTYFILEMISSING + PatternConstants.LINESEPERATOR);
-            System.exit(1);
-        }
-        
-        String configFilePath = configArgs[0];
+	public static Map<String, String> populateConfigDetails(String configFilePath) throws IOException {
         InputStream inputStream = new FileInputStream(configFilePath);
         properties.load(inputStream);
         propertiesInitialized=true;
@@ -56,6 +49,7 @@ public class ConfigManager {
         String sourceDatabasePort = properties.getProperty(ConfigConstants.SOURCEDATABASEPORT);
         String sourceDatabaseUsername = properties.getProperty(ConfigConstants.SOURCEDATABASEUSERNAME);
         String sourceDatabasePassword = properties.getProperty(ConfigConstants.SOURCEDATABASEPASSWORD);
+        String sourceDatabasePath = properties.getProperty(ConfigConstants.SOURCEDATABASEPATH);
         String schemaToMigrate = properties.getProperty(ConfigConstants.SCHEMATOMIGRATE).toUpperCase();
         String migrateSystemSchema = properties.getProperty(ConfigConstants.MIGRATESYSTEMSCHEMA, ConfigConstants.FALSE);
         String targetDatabase = properties.getProperty(ConfigConstants.TARGETDATABASE); 
@@ -82,6 +76,7 @@ public class ConfigManager {
     	configMap.put(ConfigConstants.SOURCEDATABASEPORT, sourceDatabasePort);  
     	configMap.put(ConfigConstants.SOURCEDATABASEUSERNAME, sourceDatabaseUsername);
     	configMap.put(ConfigConstants.SOURCEDATABASEPASSWORD, sourceDatabasePassword);
+    	configMap.put(ConfigConstants.SOURCEDATABASEPATH, sourceDatabasePath);
     	configMap.put(ConfigConstants.SCHEMATOMIGRATE, schemaToMigrate);
     	configMap.put(ConfigConstants.MIGRATESYSTEMSCHEMA, migrateSystemSchema);
     	configMap.put(ConfigConstants.TARGETDATABASE, targetDatabase);
@@ -141,6 +136,7 @@ public class ConfigManager {
         PrintUtil.log("*** SourceDatabasePort - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPORT) + " ]");
         PrintUtil.log("*** SourceDatabaseUsername- - - - - [ " + configMap.get(ConfigConstants.SOURCEDATABASEUSERNAME) + " ]");
         PrintUtil.log("*** SourceDatabasePassword - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPASSWORD) + " ]");
+        PrintUtil.log("*** SourceDatabasePath - - - - - - -[ " + configMap.get(ConfigConstants.SOURCEDATABASEPATH) + " ]");
         PrintUtil.log("*** SchemaToMigrate - - - - - - - - [ " + configMap.get(ConfigConstants.SCHEMATOMIGRATE) + " ]");
         PrintUtil.log("*** MigrateSystemSchema - - - - - - [ " + configMap.get(ConfigConstants.MIGRATESYSTEMSCHEMA) + " ]");
         PrintUtil.log("*** TargetDatabase - - - - - - - - -[ " + configMap.get(ConfigConstants.TARGETDATABASE) + " ]");
@@ -202,5 +198,17 @@ public class ConfigManager {
 			return properties;
 		else
 			throw new RuntimeException(XBASEConstants.PROPERTIES + PatternConstants.SPACESEPERATOR + MessageConstants.NOTINITIALIZED);
+	}
+	
+	static Map<String, String> getConfigProperties(String configFilePath) {
+		if(configMap==null)
+			try {
+				configMap = populateConfigDetails(configFilePath);
+			} catch (IOException e) {
+				PrintUtil.log(MessageType.ERROR + "IO " + MessageConstants.EXCEPTIONWHILE + "populating config details." + e.getMessage());
+				PrintUtil.log(e.toString());
+				e.printStackTrace();
+			}
+		return configMap;	
 	}
 }
