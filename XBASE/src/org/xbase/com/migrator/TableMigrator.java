@@ -37,7 +37,7 @@ public class TableMigrator {
 
 	private static List<String> childTables = new ArrayList<String>();
 
-	public static void migrate(Connection conn, Map<String, String> configMap) {
+	public static void transformAndMigrate(Connection conn, Map<String, String> configMap) {
 
 		boolean embeddingEnabled = Boolean.valueOf(configMap.get(ConfigConstants.EMBEDDING));
 		List<String> schemaList = new ArrayList<String>();

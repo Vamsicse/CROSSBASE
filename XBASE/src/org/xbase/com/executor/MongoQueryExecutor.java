@@ -139,7 +139,7 @@ public class MongoQueryExecutor {
 	 */
 	public void createView(String databaseName, String collectionName, View currentView) {
 		mongoDatabase = mongoClient.getDatabase(databaseName);
-		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+		// MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
 		
 		
 		
@@ -152,7 +152,7 @@ public class MongoQueryExecutor {
 	 */
 	public void dropView(String databaseName, String collectionName, View currentView) {
 		mongoDatabase = mongoClient.getDatabase(databaseName);
-		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+		
 		
 		InventoryManager.updateInventory(MigratorActions.VIEWDELETED, currentView.getViewName());
 	}

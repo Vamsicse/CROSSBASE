@@ -18,12 +18,12 @@ public class XBASEManager {
 	private XBASEManager() {}
 	private static Map<String, String> configMap = new HashMap<String, String>();
 	private static Connection conn = null;
-	
+	private static String dbType = null;
 	public static void main(String[] args) {
 		try {
 		InventoryManager.initiateXBASEInventory();
 		initiateConfigMap(args);
-		String dbType = determineDBType(configMap.get(ConfigConstants.SOURCEDATABASE));
+		dbType = determineDBType(configMap.get(ConfigConstants.SOURCEDATABASE));
 		if(dbType.equals(XBASEConstants.ORACLE)) {
 		 conn = OracleConnectionManager.getOracleDBConnection();
 		 if(Boolean.valueOf(configMap.get(ConfigConstants.MIGRATIONMODE))) {
@@ -39,6 +39,9 @@ public class XBASEManager {
 		if(Boolean.valueOf(configMap.get(ConfigConstants.DATAINJECTIONMODE))) {
 			DataInjectionManager.injectData(configMap.get(ConfigConstants.DATAINJECTIONRANGE));
 		}
+		else {
+			InventoryManager.log(ConfigConstants.DATAINJECTIONMODE + PatternConstants.SPACESEPERATOR + "disabled" + PatternConstants.LINESEPERATOR);
+		}
 		XBASEWindup();
 		}
 		catch(Exception e) {
@@ -53,8 +56,9 @@ public class XBASEManager {
 	 */
 	private static String determineDBType(String currentDatabaseName) {
 		currentDatabaseName = currentDatabaseName.toUpperCase();
-		if(currentDatabaseName.contains(XBASEConstants.ORACLE))
+		if(currentDatabaseName.contains(XBASEConstants.ORACLE)) {
 			return XBASEConstants.ORACLE;
+		}
 		else if(currentDatabaseName.contains(XBASEConstants.XML)) {
 			return XBASEConstants.XML;
 		}
@@ -97,7 +101,9 @@ public class XBASEManager {
 	private static void XBASEWindup() {
 		InventoryManager.createInventory(configMap.get(ConfigConstants.INVENTORYFILEPATH), configMap.get(ConfigConstants.INVENTORYFILENAME));
 		LogManager.logMigration(configMap.get(ConfigConstants.LOGFILEPATH), configMap.get(ConfigConstants.LOGFILENAME), PrintUtil.getLog());
-		OracleConnectionManager.getInstance().closeConnection(conn);
+		if(dbType.equals(XBASEConstants.ORACLE)) {
+			OracleConnectionManager.getInstance().closeConnection(conn);
+		}
 	}
 
 	public static Map<String,String> getConfigMap(){

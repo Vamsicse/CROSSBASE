@@ -9,8 +9,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.xbase.com.constants.MessageConstants;
+import org.xbase.com.constants.PatternConstants;
 import org.xbase.com.environment.EnvironmentSettings;
 
 /**
@@ -126,6 +129,23 @@ public class IOUtil {
 		return contents.toString();
 	}
 
+	public static String readFileAsString(String fileName) {
+		File databaseFile = new File(fileName);
+		if (!databaseFile.exists()) {
+			PrintUtil.log(MessageConstants.ERROR + databaseFile.toPath().toString() + " is not present." + MessageConstants.EXITING);
+			System.exit(1);
+		}
+		String fileContent = null;
+		try {
+			fileContent = new String(Files.readAllBytes(Paths.get(fileName)));
+		} catch (IOException e) {
+			PrintUtil.log(MessageConstants.ERROR + MessageConstants.EXCEPTIONWHILE + " reading " + fileName + PatternConstants.LINESEPERATOR + MessageConstants.EXITING);
+			PrintUtil.log(e.getMessage());
+			System.exit(1);
+		}
+		return fileContent;
+	}
+	
 	public static boolean dirExists(String path) {
 		File inputFile = null;
 		try {

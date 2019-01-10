@@ -12,9 +12,9 @@ import java.util.TreeMap;
 import org.xbase.com.actions.MessageType;
 import org.xbase.com.constants.ConfigConstants;
 import org.xbase.com.constants.MessageConstants;
-import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.constants.OraTables;
 import org.xbase.com.constants.PatternConstants;
+import org.xbase.com.constants.XBASEConstants;
 import org.xbase.com.environment.EnvironmentSettings;
 import org.xbase.com.executor.OracleQueryExecutor;
 import org.xbase.com.util.PrintUtil;
@@ -46,6 +46,7 @@ public class ConfigManager {
         String migrationMode = properties.getProperty(ConfigConstants.MIGRATIONMODE);
         String hostName = properties.getProperty(ConfigConstants.HOSTNAME, ConfigConstants.LOCALHOST);
         String sourceDatabase = properties.getProperty(ConfigConstants.SOURCEDATABASE);
+        String databaseFilePath = properties.getProperty(ConfigConstants.DATABASEFILEPATH);
         String sourceDatabasePort = properties.getProperty(ConfigConstants.SOURCEDATABASEPORT);
         String sourceDatabaseUsername = properties.getProperty(ConfigConstants.SOURCEDATABASEUSERNAME);
         String sourceDatabasePassword = properties.getProperty(ConfigConstants.SOURCEDATABASEPASSWORD);
@@ -73,6 +74,7 @@ public class ConfigManager {
     	configMap.put(ConfigConstants.MIGRATIONMODE, migrationMode);
     	configMap.put(ConfigConstants.HOSTNAME, hostName);
     	configMap.put(ConfigConstants.SOURCEDATABASE, sourceDatabase);
+    	configMap.put(ConfigConstants.DATABASEFILEPATH, databaseFilePath);
     	configMap.put(ConfigConstants.SOURCEDATABASEPORT, sourceDatabasePort);  
     	configMap.put(ConfigConstants.SOURCEDATABASEUSERNAME, sourceDatabaseUsername);
     	configMap.put(ConfigConstants.SOURCEDATABASEPASSWORD, sourceDatabasePassword);
@@ -159,7 +161,7 @@ public class ConfigManager {
         
         PrintUtil.log(PatternConstants.LINESEPERATOR);
         
-    	populateDatabaseName();
+    	// populateDatabaseName();
     	
         if(EnvironmentSettings.DEBUGMODE) {
     		PrintUtil.log(MessageConstants.INFO + "Debug Mode Enabled" + PatternConstants.LINESEPERATORDOUBLE);
@@ -178,7 +180,7 @@ public class ConfigManager {
 	/**
 	 * @param configMap
 	 */
-	private static void populateDatabaseName() {
+   static void populateDatabaseName() {
 		String sourceDatabaseName = fetchDatabaseName();
     	configMap.put(ConfigConstants.SOURCEDATABASENAME, sourceDatabaseName);
     	if(null==configMap.get(ConfigConstants.TARGETDATABASENAME)) {
