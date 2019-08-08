@@ -23,8 +23,6 @@ public class MongoConnectionManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// MongoCredential credential = MongoCredential.createCredential("sampleUser","myDb", "password".toCharArray());
 		
 		PrintUtil.log(MessageConstants.INFO + "Connected to the Mongo database...\n");
 		return mongo;
